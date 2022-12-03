@@ -5,7 +5,7 @@ from .probe import Probe
 
 """
 
-https://adventofcode.com/2021/day/17
+https://adventofcode.com/2022/day/17
 
 --- Part Two ---
 Maybe a fancy trick shot isn't the best idea; after all, you only have one probe, so you had better not miss.

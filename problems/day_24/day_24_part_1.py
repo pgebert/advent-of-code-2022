@@ -4,7 +4,7 @@ from .monad import monad
 
 """
 
-https://adventofcode.com/2021/day/24
+https://adventofcode.com/2022/day/24
 
 --- Day 24: Arithmetic Logic Unit ---
 Magic smoke starts leaking from the submarine's arithmetic logic unit (ALU). Without the ability to perform basic arithmetic and logic functions, the submarine can't produce cool patterns with its Christmas lights!

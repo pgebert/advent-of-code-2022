@@ -2,7 +2,7 @@ from typing import List
 
 """
 
-https://adventofcode.com/2021/day/22
+https://adventofcode.com/2022/day/22
 
 --- Day 22: Reactor Reboot ---
 Operating at these extreme ocean depths has overloaded the submarine's reactor; it needs to be rebooted.

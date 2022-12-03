@@ -2,7 +2,7 @@ from typing import List
 
 """
 
-https://adventofcode.com/2021/day/7
+https://adventofcode.com/2022/day/7
 
 --- Part Two ---
 The crabs don't seem interested in your proposed solution. Perhaps you misunderstand crab engineering?

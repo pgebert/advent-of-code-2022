@@ -7,7 +7,7 @@ from .probe import Probe
 
 """
 
-https://adventofcode.com/2021/day/17
+https://adventofcode.com/2022/day/17
 
 --- Day 17: Trick Shot ---
 You finally decode the Elves' message. HI, the message says. You continue searching for the sleigh keys.

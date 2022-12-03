@@ -5,7 +5,7 @@ from typing import List, Optional
 
 """
 
-https://adventofcode.com/2021/day/10
+https://adventofcode.com/2022/day/10
 
 --- Part Two ---
 Now, discard the corrupted lines. The remaining lines are incomplete.

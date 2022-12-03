@@ -6,7 +6,7 @@ from .paper import Paper
 
 """
 
-https://adventofcode.com/2021/day/13
+https://adventofcode.com/2022/day/13
 
 --- Part Two ---
 Finish folding the transparent paper according to the instructions. The manual says the code is always eight capital letters.

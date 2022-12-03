@@ -2,7 +2,7 @@ from typing import List
 
 """
 
-https://adventofcode.com/2021/day/8
+https://adventofcode.com/2022/day/8
 
 --- Part Two ---
 Through a little deduction, you should now be able to determine the remaining digits. Consider again the first example above:

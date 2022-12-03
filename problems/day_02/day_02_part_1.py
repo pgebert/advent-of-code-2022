@@ -2,7 +2,7 @@ from typing import List
 
 """
 
-https://adventofcode.com/2021/day/2
+https://adventofcode.com/2022/day/2
 
 --- Day 2: Dive! ---
 Now, you need to figure out how to pilot this thing.
@@ -38,7 +38,6 @@ Calculate the horizontal position and depth you would have after following the p
 
 
 def solve(input: List[str]):
-
     x, depth = 0, 0
 
     for line in input:

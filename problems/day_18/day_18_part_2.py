@@ -5,7 +5,7 @@ from .number import Number
 
 """
 
-https://adventofcode.com/2021/day/18
+https://adventofcode.com/2022/day/18
 
 --- Part Two ---
 You notice a second question on the back of the homework assignment:

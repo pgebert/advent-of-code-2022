@@ -4,7 +4,7 @@ from .polymer import Polymer
 
 """
 
-https://adventofcode.com/2021/day/14
+https://adventofcode.com/2022/day/14
 
 --- Part Two ---
 The resulting polymer isn't nearly strong enough to reinforce the submarine. You'll need to run more steps of the pair insertion process; a total of 40 steps should do it.

@@ -6,7 +6,7 @@ from .sea import Sea
 
 """
 
-https://adventofcode.com/2021/day/11
+https://adventofcode.com/2022/day/11
 
 --- Part Two ---
 It seems like the individual flashes aren't bright enough to navigate. However, you might have a better option: the flashes seem to be synchronizing!

@@ -8,7 +8,7 @@ sys.setrecursionlimit(1500)
 
 """
 
-https://adventofcode.com/2021/day/16
+https://adventofcode.com/2022/day/16
 
 --- Day 16: Packet Decoder ---
 As you leave the cave and reach open waters, you receive a transmission from the Elves back on the ship.

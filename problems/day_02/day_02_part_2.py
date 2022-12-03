@@ -2,7 +2,7 @@ from typing import List
 
 """
 
-https://adventofcode.com/2021/day/2
+https://adventofcode.com/2022/day/2
 
 --- Part Two ---
 Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
@@ -32,7 +32,6 @@ Using this new interpretation of the commands, calculate the horizontal position
 
 
 def solve(input: List[str]):
-
     x, depth, aim = 0, 0, 0
 
     for line in input:

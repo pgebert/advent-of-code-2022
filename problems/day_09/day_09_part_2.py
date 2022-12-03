@@ -4,7 +4,7 @@ from .seaFloor import SeaFloor, Point
 
 """
 
-https://adventofcode.com/2021/day/9
+https://adventofcode.com/2022/day/9
 
 --- Part Two ---
 Next, you need to find the largest basins so you know what areas are most important to avoid.

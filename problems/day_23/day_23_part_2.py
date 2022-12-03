@@ -7,7 +7,7 @@ from .state import State
 
 """
 
-https://adventofcode.com/2021/day/23
+https://adventofcode.com/2022/day/23
 
 --- Part Two ---
 As you prepare to give the amphipods your solution, you notice that the diagram they handed you was actually folded up. As you unfold it, you discover an extra part of the diagram.

@@ -4,7 +4,7 @@ from .enhancement import Enhancement
 
 """
 
-https://adventofcode.com/2021/day/20
+https://adventofcode.com/2022/day/20
 
 --- Day 20: Trench Map ---
 With the scanners fully deployed, you turn their attention to mapping the floor of the ocean trench.

@@ -3,7 +3,7 @@ from typing import List
 
 """
 
-https://adventofcode.com/2021/day/6
+https://adventofcode.com/2022/day/6
 
 --- Part Two ---
 Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?

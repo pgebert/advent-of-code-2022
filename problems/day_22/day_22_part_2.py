@@ -5,7 +5,7 @@ from typing import List, Iterator
 
 """
 
-https://adventofcode.com/2021/day/22
+https://adventofcode.com/2022/day/22
 
 --- Part Two ---
 Now that the initialization procedure is complete, you can reboot the reactor.

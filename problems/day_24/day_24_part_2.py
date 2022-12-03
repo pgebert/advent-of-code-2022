@@ -4,7 +4,7 @@ from .monad import monad
 
 """
 
-https://adventofcode.com/2021/day/24
+https://adventofcode.com/2022/day/24
 
 --- Part Two ---
 As the submarine starts booting up things like the Retro Encabulator, you realize that maybe you don't need all these submarine features after all.

@@ -4,7 +4,7 @@ from .board import Board
 
 """
 
-https://adventofcode.com/2021/day/4
+https://adventofcode.com/2022/day/4
 
 --- Part Two ---
 On the other hand, it might be wise to try a different strategy: let the giant squid win.

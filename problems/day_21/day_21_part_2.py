@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 """
 
-https://adventofcode.com/2021/day/21
+https://adventofcode.com/2022/day/21
 
 --- Part Two ---
 Now that you're warmed up, it's time to play the real game.

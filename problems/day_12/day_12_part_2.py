@@ -4,7 +4,7 @@ from .graph import Graph
 
 """
 
-https://adventofcode.com/2021/day/12
+https://adventofcode.com/2022/day/12
 
 """
 

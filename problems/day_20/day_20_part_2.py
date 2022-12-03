@@ -4,7 +4,7 @@ from .enhancement import Enhancement
 
 """
 
-https://adventofcode.com/2021/day/20
+https://adventofcode.com/2022/day/20
 
 --- Part Two ---
 You still can't quite make out the details in the image. Maybe you just didn't enhance it enough.

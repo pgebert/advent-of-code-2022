@@ -6,7 +6,7 @@ from .utils import align_scanners, parse_input
 
 """
 
-https://adventofcode.com/2021/day/19
+https://adventofcode.com/2022/day/19
 
 --- Part Two ---
 Sometimes, it's a good idea to appreciate just how big the ocean is. Using the Manhattan distance, how far apart do the scanners get?

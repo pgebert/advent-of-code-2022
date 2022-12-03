@@ -8,7 +8,7 @@ sys.setrecursionlimit(1500)
 
 """
 
-https://adventofcode.com/2021/day/16
+https://adventofcode.com/2022/day/16
 
 --- Part Two ---
 Now that you have the structure of your transmission decoded, you can calculate the value of the expression it represents.
