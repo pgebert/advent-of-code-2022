@@ -44,7 +44,7 @@ foo@bar:~$ pip install -e .
 Run tests:
 
 ```console
-foo@bar:~$ pytest .\tests\
+foo@bar:~$ python -m pytest .\tests\
 ```
 
 Happy coding 🥳

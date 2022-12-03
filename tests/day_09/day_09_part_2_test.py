@@ -18,7 +18,7 @@ def test_day_09_part_2_example():
 
 
 def test_day_09_part_2_problem():
-    input = read_lines_from_file("..\\..\\data\\day_09\\day_09_input.txt")
+    input = read_lines_from_file(".\\data\\day_09\\day_09_input.txt")
     result = day_09_part_2.solve(input)
 
     assert 900900 == result

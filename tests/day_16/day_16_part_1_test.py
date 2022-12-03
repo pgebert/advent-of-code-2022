@@ -11,5 +11,5 @@ def test_day_16_part_1_example():
 
 
 def test_day_16_part_1_problem():
-    input = read_lines_from_file("..\\..\\data\\day_16\\day_16_input.txt")
+    input = read_lines_from_file(".\\data\\day_16\\day_16_input.txt")
     assert 957 == day_16_part_1.solve(input[0])

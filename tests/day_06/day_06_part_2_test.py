@@ -29,7 +29,7 @@ def test_day_06_part_2_example():
 
 
 def test_day_06_part_2_problem():
-    input = read_lines_from_file("..\\..\\data\\day_06\\day_06_input.txt")
+    input = read_lines_from_file(".\\data\\day_06\\day_06_input.txt")
     result = day_06_part_2.solve(input, 256)
 
     assert 1749945484935 == result

@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import List
 
 
@@ -11,6 +12,9 @@ def read_lines_from_file(path: str, blank_lines: bool = False) -> List[str]:
     Returns:
         List[str]: list of lines
     """
+    root = Path(__file__).parent.parent
+    path = root.joinpath(path)
+
     with open(path) as file:
         lines = file.readlines()
         lines = [line.rstrip() for line in lines]

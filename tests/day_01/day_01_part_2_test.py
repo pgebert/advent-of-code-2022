@@ -23,11 +23,11 @@ def test_day_01_part_2_example():
     input = read_lines_from_comment(example, True)
     result = day_01_part_2.solve(input)
 
-    assert 45000 == result
+    assert result == 45000
 
 
 def test_day_01_part_2_problem():
-    input = read_lines_from_file("..\\..\\data\\day_01\\day_01_input.txt", True)
+    input = read_lines_from_file(".\\data\\day_01\\day_01_input.txt", True)
     result = day_01_part_2.solve(input)
 
-    assert 213089 == result
+    assert result == 213089
