@@ -4,22 +4,19 @@ from utils import read_lines_from_comment, read_lines_from_file
 
 def test_day_02_part_1_example():
     example = """
-        forward 5
-        down 5
-        forward 8
-        up 3
-        down 8
-        forward 2
+        A Y
+        B X
+        C Z
     """
 
     input = read_lines_from_comment(example)
     result = day_02_part_1.solve(input)
 
-    assert 150 == result
+    assert 15 == result
 
 
 def test_day_02_part_1_problem():
     input = read_lines_from_file("..\\..\\data\\day_02\\day_02_input.txt")
     result = day_02_part_1.solve(input)
 
-    assert 1635930 == result
+    assert 11603 == result

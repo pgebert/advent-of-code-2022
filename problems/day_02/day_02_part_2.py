@@ -5,45 +5,47 @@ from typing import List
 https://adventofcode.com/2022/day/2
 
 --- Part Two ---
-Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
+The Elf finishes helping with the tent and sneaks back over to you. "Anyway, the second column says how the round needs to end: X means you need to lose, Y means you need to end the round in a draw, and Z means you need to win. Good luck!"
 
-In addition to horizontal position and depth, you'll also need to track a third value, aim, which also starts at 0. The commands also mean something entirely different than you first thought:
+The total score is still calculated in the same way, but now you need to figure out what shape to choose so the round ends as indicated. The example above now goes like this:
 
-down X increases your aim by X units.
-up X decreases your aim by X units.
-forward X does two things:
-It increases your horizontal position by X units.
-It increases your depth by your aim multiplied by X.
-Again note that since you're on a submarine, down and up do the opposite of what you might expect: "down" means aiming in the positive direction.
+In the first round, your opponent will choose Rock (A), and you need the round to end in a draw (Y), so you also choose Rock. This gives you a score of 1 + 3 = 4.
+In the second round, your opponent will choose Paper (B), and you choose Rock so you lose (X) with a score of 1 + 0 = 1.
+In the third round, you will defeat your opponent's Scissors with Rock for a score of 1 + 6 = 7.
+Now that you're correctly decrypting the ultra top secret strategy guide, you would get a total score of 12.
 
-Now, the above example does something different:
-
-forward 5 adds 5 to your horizontal position, a total of 5. Because your aim is 0, your depth does not change.
-down 5 adds 5 to your aim, resulting in a value of 5.
-forward 8 adds 8 to your horizontal position, a total of 13. Because your aim is 5, your depth increases by 8*5=40.
-up 3 decreases your aim by 3, resulting in a value of 2.
-down 8 adds 8 to your aim, resulting in a value of 10.
-forward 2 adds 2 to your horizontal position, a total of 15. Because your aim is 10, your depth increases by 2*10=20 to a total of 60.
-After following these new instructions, you would have a horizontal position of 15 and a depth of 60. (Multiplying these produces 900.)
-
-Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. What do you get if you multiply your final horizontal position by your final depth?
-
+Following the Elf's instructions for the second column, what would your total score be if everything goes exactly according to your strategy guide?
+ 
 """
 
 
 def solve(input: List[str]):
-    x, depth, aim = 0, 0, 0
+    score = 0
 
     for line in input:
 
-        command, value = line.split(" ")
+        opponent, you = line.split(" ")
 
-        if command == "forward":
-            x += int(value)
-            depth += int(value) * aim
-        elif command == "up":
-            aim -= int(value)
-        elif command == "down":
-            aim += int(value)
+        if opponent == "A":
+            if you == "X":
+                score += 0 + 3
+            elif you == "Y":
+                score += 3 + 1
+            elif you == "Z":
+                score += 6 + 2
+        elif opponent == "B":
+            if you == "X":
+                score += 0 + 1
+            elif you == "Y":
+                score += 3 + 2
+            elif you == "Z":
+                score += 6 + 3
+        elif opponent == "C":
+            if you == "X":
+                score += 0 + 2
+            elif you == "Y":
+                score += 3 + 3
+            elif you == "Z":
+                score += 6 + 1
 
-    return x * depth
+    return score
