@@ -40,7 +40,7 @@ def test_day_12_part_2_example_medium():
 
 
 def test_day_12_part_2_problem():
-    input = read_lines_from_file(".\\data\\day_12\\day_12_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_12\\day_12_input.txt")
     result = day_12_part_2.solve(input)
 
     assert 89592 == result

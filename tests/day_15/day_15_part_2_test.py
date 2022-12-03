@@ -23,7 +23,7 @@ def test_day_15_part_2_example():
 
 
 def test_day_15_part_2_problem():
-    input = read_lines_from_file(".\\data\\day_15\\day_15_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_15\\day_15_input.txt")
     result = day_15_part_2.solve(input)
 
     assert 2935 == result

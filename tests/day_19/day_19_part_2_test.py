@@ -149,7 +149,7 @@ def test_day_19_part_2_example():
 
 
 def test_day_19_part_2_problem():
-    input = read_lines_from_file(".\\data\\day_19\\day_19_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_19\\day_19_input.txt")
     result = day_19_part_2.solve(input)
 
     assert 12306 == result

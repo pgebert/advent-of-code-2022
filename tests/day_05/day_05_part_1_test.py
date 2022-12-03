@@ -23,7 +23,7 @@ def test_day_05_part_1_example():
 
 
 def test_day_05_part_1_problem():
-    input = read_lines_from_file(".\\data\\day_05\\day_05_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_05\\day_05_input.txt")
     result = day_05_part_1.solve(input)
 
     assert 5442 == result

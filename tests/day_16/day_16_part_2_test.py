@@ -14,5 +14,5 @@ def test_day_16_part_2_example():
 
 
 def test_day_16_part_2_problem():
-    input = read_lines_from_file(".\\data\\day_16\\day_16_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_16\\day_16_input.txt")
     assert 744953223228 == day_16_part_2.solve(input[0])

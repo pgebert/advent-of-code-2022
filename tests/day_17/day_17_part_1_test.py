@@ -14,7 +14,7 @@ def test_day_17_part_1_example():
 
 
 def test_day_17_part_1_problem():
-    input = read_lines_from_file(".\\data\\day_17\\day_17_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_17\\day_17_input.txt")
     result = day_17_part_1.solve(input)
 
     assert 4005 == result

@@ -14,7 +14,7 @@ def test_day_07_part_2_example():
 
 
 def test_day_07_part_2_problem():
-    input = read_lines_from_file(".\\data\\day_07\\day_07_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_07\\day_07_input.txt")
     result = day_07_part_2.solve(input)
 
     assert 94017638 == result

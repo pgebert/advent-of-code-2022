@@ -95,7 +95,7 @@ def test_day_22_part_2_example_large():
 
 
 def test_day_22_part_2_problem():
-    input = read_lines_from_file(".\\data\\day_22\\day_22_input.txt")
+    input = read_lines_from_file("..\\..\\data\\day_22\\day_22_input.txt")
     result = day_22_part_2.solve(input)
 
     assert 1227345351869476 == result
