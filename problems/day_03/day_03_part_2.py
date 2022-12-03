@@ -1,3 +1,4 @@
+import string
 from typing import List
 
 """
@@ -5,68 +6,49 @@ from typing import List
 https://adventofcode.com/2022/day/3
 
 --- Part Two ---
-Next, you should verify the life support rating, which can be determined by multiplying the oxygen generator rating by the CO2 scrubber rating.
+As you finish identifying the misplaced items, the Elves come to you with another issue.
 
-Both the oxygen generator rating and the CO2 scrubber rating are values that can be found in your diagnostic report - finding them is the tricky part. Both values are located using a similar process that involves filtering out values until only one remains. Before searching for either rating value, start with the full list of binary numbers from your diagnostic report and consider just the first bit of those numbers. Then:
+For safety, the Elves are divided into groups of three. Every Elf carries a badge that identifies their group. For efficiency, within each group of three Elves, the badge is the only item type carried by all three Elves. That is, if a group's badge is item type B, then all three Elves will have item type B somewhere in their rucksack, and at most two of the Elves will be carrying any other item type.
 
-Keep only numbers selected by the bit criteria for the type of rating value for which you are searching. Discard numbers which do not match the bit criteria.
-If you only have one number left, stop; this is the rating value for which you are searching.
-Otherwise, repeat the process, considering the next bit to the right.
-The bit criteria depends on which type of rating value you want to find:
+The problem is that someone forgot to put this year's updated authenticity sticker on the badges. All of the badges need to be pulled out of the rucksacks so the new authenticity stickers can be attached.
 
-To find oxygen generator rating, determine the most common value (0 or 1) in the current bit position, and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 1 in the position being considered.
-To find CO2 scrubber rating, determine the least common value (0 or 1) in the current bit position, and keep only numbers with that bit in that position. If 0 and 1 are equally common, keep values with a 0 in the position being considered.
-For example, to determine the oxygen generator rating value using the same example diagnostic report from above:
+Additionally, nobody wrote down which item type corresponds to each group's badges. The only way to tell which item type is the right one is by finding the one item type that is common between all three Elves in each group.
 
-Start with all 12 numbers and consider only the first bit of each number. There are more 1 bits (7) than 0 bits (5), so keep only the 7 numbers with a 1 in the first position: 11110, 10110, 10111, 10101, 11100, 10000, and 11001.
-Then, consider the second bit of the 7 remaining numbers: there are more 0 bits (4) than 1 bits (3), so keep only the 4 numbers with a 0 in the second position: 10110, 10111, 10101, and 10000.
-In the third position, three of the four numbers have a 1, so keep those three: 10110, 10111, and 10101.
-In the fourth position, two of the three numbers have a 1, so keep those two: 10110 and 10111.
-In the fifth position, there are an equal number of 0 bits and 1 bits (one each). So, to find the oxygen generator rating, keep the number with a 1 in that position: 10111.
-As there is only one number left, stop; the oxygen generator rating is 10111, or 23 in decimal.
-Then, to determine the CO2 scrubber rating value from the same example above:
+Every set of three lines in your list corresponds to a single group, but each group can have a different badge item type. So, in the above example, the first group's rucksacks are the first three lines:
 
-Start again with all 12 numbers and consider only the first bit of each number. There are fewer 0 bits (5) than 1 bits (7), so keep only the 5 numbers with a 0 in the first position: 00100, 01111, 00111, 00010, and 01010.
-Then, consider the second bit of the 5 remaining numbers: there are fewer 1 bits (2) than 0 bits (3), so keep only the 2 numbers with a 1 in the second position: 01111 and 01010.
-In the third position, there are an equal number of 0 bits and 1 bits (one each). So, to find the CO2 scrubber rating, keep the number with a 0 in that position: 01010.
-As there is only one number left, stop; the CO2 scrubber rating is 01010, or 10 in decimal.
-Finally, to find the life support rating, multiply the oxygen generator rating (23) by the CO2 scrubber rating (10) to get 230.
+vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+And the second group's rucksacks are the next three lines:
 
-Use the binary numbers in your diagnostic report to calculate the oxygen generator rating and CO2 scrubber rating, then multiply them together. What is the life support rating of the submarine? (Be sure to represent your answer in decimal, not binary.)
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
+In the first group, the only item type that appears in all three rucksacks is lowercase r; this must be their badges. In the second group, their badge item type must be Z.
+
+Priorities for these items must still be found to organize the sticker attachment efforts: here, they are 18 (r) for the first group and 52 (Z) for the second group. The sum of these is 70.
+
+Find the item type that corresponds to the badges of each three-Elf group. What is the sum of the priorities of those item types?
+
 """
 
 
-def most_common(lst):
-    cnt_one = len([bit for bit in lst if bit == "1"])
-    cnt_zero = len([bit for bit in lst if bit == "0"])
-    return "0" if cnt_zero > cnt_one else "1"
-
-
-def least_common(lst):
-    cnt_one = len([bit for bit in lst if bit == "1"])
-    cnt_zero = len([bit for bit in lst if bit == "0"])
-    return "0" if cnt_zero <= cnt_one else "1"
-
-
-def filter_by_first_bits(input, evaluate_first_bits):
-    candidates = list(input)
-    len_bits = len(input[0])
-    i = 0
-
-    while len(candidates) > 1 and i < len_bits:
-        first_bits = [candidate[i] for candidate in candidates]
-        bit = evaluate_first_bits(first_bits)
-        candidates = [candidate for candidate in candidates if candidate[i] == bit]
-        i += 1
-
-    return next((candidate for candidate in candidates))
+def get_priority(character: str) -> int:
+    return string.ascii_letters.index(character) + 1
 
 
 def solve(input: List[str]):
-    oxygen_generator_rating_binary = filter_by_first_bits(input, most_common)
-    co2_scrubber_rating_binary = filter_by_first_bits(input, least_common)
+    result = 0
 
-    oxygen_generator_rating = int(oxygen_generator_rating_binary, 2)
-    co2_scrubber_rating = int(co2_scrubber_rating_binary, 2)
+    for i in range(0, len(input), 3):
+        for character in input[i]:
 
-    return oxygen_generator_rating * co2_scrubber_rating
+            if (
+                    input[i].count(character) >= 1
+                    and input[i + 1].count(character) >= 1
+                    and input[i + 2].count(character) >= 1
+            ):
+                result += get_priority(character)
+                break
+
+    return result

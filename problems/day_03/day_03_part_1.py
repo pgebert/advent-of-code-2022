@@ -1,66 +1,58 @@
+import string
 from typing import List
 
 """
 
 https://adventofcode.com/2022/day/3
 
---- Day 3: Binary Diagnostic ---
-The submarine has been making some odd creaking noises, so you ask it to produce a diagnostic report just in case.
+--- Day 3: Rucksack Reorganization ---
+One Elf has the important job of loading all of the rucksacks with supplies for the jungle journey. Unfortunately, that Elf didn't quite follow the packing instructions, and so a few items now need to be rearranged.
 
-The diagnostic report (your puzzle input) consists of a list of binary numbers which, when decoded properly, can tell you many useful things about the conditions of the submarine. The first parameter to check is the power consumption.
+Each rucksack has two large compartments. All items of a given type are meant to go into exactly one of the two compartments. The Elf that did the packing failed to follow this rule for exactly one item type per rucksack.
 
-You need to use the binary numbers in the diagnostic report to generate two new binary numbers (called the gamma rate and the epsilon rate). The power consumption can then be found by multiplying the gamma rate by the epsilon rate.
+The Elves have made a list of all of the items currently in each rucksack (your puzzle input), but they need your help finding the errors. Every item type is identified by a single lowercase or uppercase letter (that is, a and A refer to different types of items).
 
-Each bit in the gamma rate can be determined by finding the most common bit in the corresponding position of all numbers in the diagnostic report. For example, given the following diagnostic report:
+The list of items for each rucksack is given as characters all on a single line. A given rucksack always has the same number of items in each of its two compartments, so the first half of the characters represent items in the first compartment, while the second half of the characters represent items in the second compartment.
 
-00100
-11110
-10110
-10111
-10101
-01111
-00111
-11100
-10000
-11001
-00010
-01010
-Considering only the first bit of each number, there are five 0 bits and seven 1 bits. Since the most common bit is 1, the first bit of the gamma rate is 1.
+For example, suppose you have the following list of contents from six rucksacks:
 
-The most common second bit of the numbers in the diagnostic report is 0, so the second bit of the gamma rate is 0.
+vJrwpWtwJgWrhcsFMMfFFhFp
+jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL
+PmmdzqPrVvPwwTWBwg
+wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn
+ttgJtRGJQctTZtZT
+CrZsJsPPZsGzwwsLwLmpwMDw
+The first rucksack contains the items vJrwpWtwJgWrhcsFMMfFFhFp, which means its first compartment contains the items vJrwpWtwJgWr, while the second compartment contains the items hcsFMMfFFhFp. The only item type that appears in both compartments is lowercase p.
+The second rucksack's compartments contain jqHRNqRjqzjGDLGL and rsFMfFZSrLrFZsSL. The only item type that appears in both compartments is uppercase L.
+The third rucksack's compartments contain PmmdzqPrV and vPwwTWBwg; the only common item type is uppercase P.
+The fourth rucksack's compartments only share item type v.
+The fifth rucksack's compartments only share item type t.
+The sixth rucksack's compartments only share item type s.
+To help prioritize item rearrangement, every item type can be converted to a priority:
 
-The most common value of the third, fourth, and fifth bits are 1, 1, and 0, respectively, and so the final three bits of the gamma rate are 110.
+Lowercase item types a through z have priorities 1 through 26.
+Uppercase item types A through Z have priorities 27 through 52.
+In the above example, the priority of the item type that appears in both compartments of each rucksack is 16 (p), 38 (L), 42 (P), 22 (v), 20 (t), and 19 (s); the sum of these is 157.
 
-So, the gamma rate is the binary number 10110, or 22 in decimal.
-
-The epsilon rate is calculated in a similar way; rather than use the most common bit, the least common bit from each position is used. So, the epsilon rate is 01001, or 9 in decimal. Multiplying the gamma rate (22) by the epsilon rate (9) produces the power consumption, 198.
-
-Use the binary numbers in your diagnostic report to calculate the gamma rate and epsilon rate, then multiply them together. What is the power consumption of the submarine? (Be sure to represent your answer in decimal, not binary.)
-
+Find the item type that appears in both compartments of each rucksack. What is the sum of the priorities of those item types?
 """
 
 
-def most_common(lst):
-    return max(set(lst), key=lst.count)
-
-
-def least_common(lst):
-    return min(set(lst), key=lst.count)
+def get_priority(character: str) -> int:
+    return string.ascii_letters.index(character) + 1
 
 
 def solve(input: List[str]):
-    len_bits = len(input[0])
-
-    bits = {i: [] for i in range(len_bits)}
+    result = 0
 
     for line in input:
-        for i in range(len_bits):
-            bits[i].append(line[i])
+        pivot = len(line) // 2
+        first = {char for char in line[:pivot]}
+        second = {char for char in line[pivot:]}
 
-    gamma_binary = "".join([most_common(bits[i]) for i in bits.keys()])
-    epsilon_binary = "".join([least_common(bits[i]) for i in bits.keys()])
+        intersection = first.intersection(second)
 
-    gamma = int(gamma_binary, 2)
-    epsilon = int(epsilon_binary, 2)
+        for item in intersection:
+            result += get_priority(item)
 
-    return gamma * epsilon
+    return result
