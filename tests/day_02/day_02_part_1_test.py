@@ -12,11 +12,11 @@ def test_day_02_part_1_example():
     input = read_lines_from_comment(example)
     result = day_02_part_1.solve(input)
 
-    assert 15 == result
+    assert result == 15
 
 
 def test_day_02_part_1_problem():
     input = read_lines_from_file(".\\data\\day_02\\day_02_input.txt")
     result = day_02_part_1.solve(input)
 
-    assert 11603 == result
+    assert result == 11603
