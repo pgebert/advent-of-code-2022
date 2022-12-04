@@ -10,6 +10,6 @@ setup(
     author_email='info@patrickgebert.de',
     description='Advent of code 2022 solutions written in python.',
     install_requires=[
-        'pytest==6.2.5'
+        'pytest==7.2'
     ],
 )
