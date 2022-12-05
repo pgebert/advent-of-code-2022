@@ -1,61 +1,77 @@
 from typing import List
 
-from .oceanFloor import OceanFloor, Point, Line
+from problems.day_05.parsing import parse_instructions, parse_stacks, parse_divider
 
 """
 
 https://adventofcode.com/2022/day/5
 
---- Day 5: Hydrothermal Venture ---
-You come across a field of hydrothermal vents on the ocean floor! These vents constantly produce large, opaque clouds, so it would be best to avoid them if possible.
+--- Day 5: Supply Stacks ---
+The expedition can depart as soon as the final supplies have been unloaded from the ships. Supplies are stored in stacks of marked crates, but because the needed supplies are buried under many other crates, the crates need to be rearranged.
 
-They tend to form in lines; the submarine helpfully produces a list of nearby lines of vents (your puzzle input) for you to review. For example:
+The ship has a giant cargo crane capable of moving crates between stacks. To ensure none of the crates get crushed or fall over, the crane operator will rearrange them in a series of carefully-planned steps. After the crates are rearranged, the desired crates will be at the top of each stack.
 
-0,9 -> 5,9
-8,0 -> 0,8
-9,4 -> 3,4
-2,2 -> 2,1
-7,0 -> 7,4
-6,4 -> 2,0
-0,9 -> 2,9
-3,4 -> 1,4
-0,0 -> 8,8
-5,5 -> 8,2
-Each line of vents is given as a line segment in the format x1,y1 -> x2,y2 where x1,y1 are the coordinates of one end the line segment and x2,y2 are the coordinates of the other end. These line segments include the points at both ends. In other words:
+The Elves don't want to interrupt the crane operator during this delicate procedure, but they forgot to ask her which crate will end up where, and they want to be ready to unload them as soon as possible so they can embark.
 
-An entry like 1,1 -> 1,3 covers points 1,1, 1,2, and 1,3.
-An entry like 9,7 -> 7,7 covers points 9,7, 8,7, and 7,7.
-For now, only consider horizontal and vertical lines: lines where either x1 = x2 or y1 = y2.
+They do, however, have a drawing of the starting stacks of crates and the rearrangement procedure (your puzzle input). For example:
 
-So, the horizontal and vertical lines from the above list would produce the following diagram:
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
 
-.......1..
-..1....1..
-..1....1..
-.......1..
-.112111211
-..........
-..........
-..........
-..........
-222111....
-In this diagram, the top left corner is 0,0 and the bottom right corner is 9,9. Each position is shown as the number of lines which cover that point or . if no line covers that point. The top-left pair of 1s, for example, comes from 2,2 -> 2,1; the very bottom row is formed by the overlapping lines 0,9 -> 5,9 and 0,9 -> 2,9.
+move 1 from 2 to 1
+move 3 from 1 to 3
+move 2 from 2 to 1
+move 1 from 1 to 2
+In this example, there are three stacks of crates. Stack 1 contains two crates: crate Z is on the bottom, and crate N is on top. Stack 2 contains three crates; from bottom to top, they are crates M, C, and D. Finally, stack 3 contains a single crate, P.
 
-To avoid the most dangerous areas, you need to determine the number of points where at least two lines overlap. In the above example, this is anywhere in the diagram with a 2 or larger - a total of 5 points.
+Then, the rearrangement procedure is given. In each step of the procedure, a quantity of crates is moved from one stack to a different stack. In the first step of the above rearrangement procedure, one crate is moved from stack 2 to stack 1, resulting in this configuration:
 
-Consider only horizontal and vertical lines. At how many points do at least two lines overlap?
+[D]        
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+In the second step, three crates are moved from stack 1 to stack 3. Crates are moved one at a time, so the first crate to be moved (D) ends up below the second and third crates:
+
+        [Z]
+        [N]
+    [C] [D]
+    [M] [P]
+ 1   2   3
+Then, both crates are moved from stack 2 to stack 1. Again, because crates are moved one at a time, crate C ends up below crate M:
+
+        [Z]
+        [N]
+[M]     [D]
+[C]     [P]
+ 1   2   3
+Finally, one crate is moved from stack 1 to stack 2:
+
+        [Z]
+        [N]
+        [D]
+[C] [M] [P]
+ 1   2   3
+The Elves just need to know which crate will end up on top of each stack; in this example, the top crates are C in stack 1, M in stack 2, and Z in stack 3, so you should combine these together and give the Elves the message CMZ.
+
+After the rearrangement procedure completes, what crate ends up on top of each stack?
+
+
 """
 
 
 def solve(input: List[str]):
-    floor = OceanFloor(1000)
+    divider = parse_divider(input)
+    stacks = parse_stacks(input[:divider])
+    instructions = parse_instructions(input[divider + 1:])
 
-    for line in input:
-        point_1, point_2 = line.split("->", 2)
-        start = Point(*map(int, point_1.split(",")))
-        end = Point(*map(int, point_2.split(",")))
+    for repeat, source, target in instructions:
 
-        if start.x == end.x or start.y == end.y:
-            floor.set_line(Line(start, end))
+        for _ in range(repeat):
+            item = stacks[source - 1].pop()
+            stacks[target - 1].append(item)
 
-    return floor.get_number_vulcanos()
+    top_items = "".join([stack[-1] if len(stack) > 0 else "" for stack in stacks])
+
+    return top_items

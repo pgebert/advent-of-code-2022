@@ -1,46 +1,68 @@
 from typing import List
 
-from .oceanFloor import OceanFloor, Point, Line
+from parsing import parse_divider, parse_instructions, parse_stacks
 
 """
 
 https://adventofcode.com/2022/day/5
 
 --- Part Two ---
-Unfortunately, considering only horizontal and vertical lines doesn't give you the full picture; you need to also consider diagonal lines.
+As you watch the crane operator expertly rearrange the crates, you notice the process isn't following your prediction.
 
-Because of the limits of the hydrothermal vent mapping system, the lines in your list will only ever be horizontal, vertical, or a diagonal line at exactly 45 degrees. In other words:
+Some mud was covering the writing on the side of the crane, and you quickly wipe it away. The crane isn't a CrateMover 9000 - it's a CrateMover 9001.
 
-An entry like 1,1 -> 3,3 covers points 1,1, 2,2, and 3,3.
-An entry like 9,7 -> 7,9 covers points 9,7, 8,8, and 7,9.
-Considering all lines from the above example would now produce the following diagram:
+The CrateMover 9001 is notable for many new and exciting features: air conditioning, leather seats, an extra cup holder, and the ability to pick up and move multiple crates at once.
 
-1.1....11.
-.111...2..
-..2.1.111.
-...1.2.2..
-.112313211
-...1.2....
-..1...1...
-.1.....1..
-1.......1.
-222111....
-You still need to determine the number of points where at least two lines overlap. In the above example, this is still anywhere in the diagram with a 2 or larger - now a total of 12 points.
+Again considering the example above, the crates begin in the same configuration:
 
-Consider all of the lines. At how many points do at least two lines overlap?
+    [D]    
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+Moving a single crate from stack 2 to stack 1 behaves the same as before:
 
+[D]        
+[N] [C]    
+[Z] [M] [P]
+ 1   2   3 
+However, the action of moving three crates from stack 1 to stack 3 means that those three moved crates stay in the same order, resulting in this new configuration:
+
+        [D]
+        [N]
+    [C] [Z]
+    [M] [P]
+ 1   2   3
+Next, as both crates are moved from stack 2 to stack 1, they retain their order as well:
+
+        [D]
+        [N]
+[C]     [Z]
+[M]     [P]
+ 1   2   3
+Finally, a single crate is still moved from stack 1 to stack 2, but now it's crate C that gets moved:
+
+        [D]
+        [N]
+        [Z]
+[M] [C] [P]
+ 1   2   3
+In this example, the CrateMover 9001 has put the crates in a totally different order: MCD.
+
+Before the rearrangement process finishes, update your simulation so that the Elves know where they should stand to be ready to unload the final supplies. After the rearrangement procedure completes, what crate ends up on top of each stack?
 
 """
 
 
 def solve(input: List[str]):
-    floor = OceanFloor(1000)
+    divider = parse_divider(input)
+    stacks = parse_stacks(input[:divider])
+    instructions = parse_instructions(input[divider + 1:])
 
-    for line in input:
-        point_1, point_2 = line.split("->", 2)
-        start = Point(*map(int, point_1.split(",")))
-        end = Point(*map(int, point_2.split(",")))
+    for amount, source, target in instructions:
+        items = stacks[source - 1][-amount:]
+        stacks[target - 1].extend(items)
+        del stacks[source - 1][-amount:]
 
-        floor.set_line(Line(start, end))
+    top_items = "".join([stack[-1] if len(stack) > 0 else "" for stack in stacks])
 
-    return floor.get_number_vulcanos()
+    return top_items
