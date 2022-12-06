@@ -1,25 +1,26 @@
 from problems.day_06 import day_06_part_1
-from utils import read_lines_from_comment, read_lines_from_file
+from utils import read_lines_from_file
 
 
 def test_day_06_part_1_example():
-    example = """
-        3,4,3,1,2
-    """
+    result = day_06_part_1.solve("mjqjpqmgbljsphdztnvjfqwrcgsmlb")
+    assert result == 7
 
-    input = read_lines_from_comment(example)
+    result = day_06_part_1.solve("bvwbjplbgvbhsrlpgdmjqwftvncz")
+    assert result == 5
 
-    result = day_06_part_1.solve(input, 18)
+    result = day_06_part_1.solve("nppdvjthqldpwncqszvftbrmjlhg")
+    assert result == 6
 
-    assert 26 == result
+    result = day_06_part_1.solve("nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg")
+    assert result == 10
 
-    result = day_06_part_1.solve(input, 80)
-
-    assert 5934 == result
+    result = day_06_part_1.solve("zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw")
+    assert result == 11
 
 
 def test_day_06_part_1_problem():
     input = read_lines_from_file(".\\data\\day_06\\day_06_input.txt")
-    result = day_06_part_1.solve(input, 80)
+    result = day_06_part_1.solve(input[0])
 
-    assert 390923 == result
+    assert result == 1707

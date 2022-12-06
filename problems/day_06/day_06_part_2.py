@@ -1,47 +1,27 @@
-from dataclasses import dataclass
-from typing import List
-
 """
 
 https://adventofcode.com/2022/day/6
 
 --- Part Two ---
-Suppose the lanternfish live forever and have unlimited food and space. Would they take over the entire ocean?
+Your device's communication system is correctly detecting packets, but still isn't working. It looks like it also needs to look for messages.
 
-After 256 days in the example above, there would be a total of 26984457539 lanternfish!
+A start-of-message marker is just like a start-of-packet marker, except it consists of 14 distinct characters rather than 4.
 
-How many lanternfish would there be after 256 days?
+Here are the first positions of start-of-message markers for all of the above examples:
 
+mjqjpqmgbljsphdztnvjfqwrcgsmlb: first marker after character 19
+bvwbjplbgvbhsrlpgdmjqwftvncz: first marker after character 23
+nppdvjthqldpwncqszvftbrmjlhg: first marker after character 23
+nznrnfrfntjfmvfwmzdfjlvtqnbhcprsg: first marker after character 29
+zcfzfwzzqfrljwzlrfnpqdbhtmscgvjw: first marker after character 26
+How many characters need to be processed before the first start-of-message marker is detected?
 
 """
 
 
-@dataclass
-class School:
-    age: int
-    members: int = 0
+def solve(buffer: str, marker_size: int = 14):
+    for i in range(marker_size, len(buffer)):
+        if len(set(buffer[i - marker_size:i])) == marker_size:
+            return i
 
-
-def solve(input: List[str], days: int):
-    ages = list(map(int, input[0].split(",")))
-
-    schools = [School(age) for age in range(9)]
-
-    for age in ages:
-        schools[age].members += 1
-
-    for day in range(days):
-
-        new_members = 0
-
-        for age, school in enumerate(schools):
-
-            if age == 0:
-                new_members = school.members
-            else:
-                schools[age - 1].members = school.members
-
-        schools[6].members += new_members
-        schools[8].members = new_members
-
-    return sum((school.members for school in schools))
+    return -1
