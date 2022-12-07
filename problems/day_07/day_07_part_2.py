@@ -1,46 +1,97 @@
-from typing import List
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import List, Set
 
 """
 
 https://adventofcode.com/2022/day/7
 
 --- Part Two ---
-The crabs don't seem interested in your proposed solution. Perhaps you misunderstand crab engineering?
+Now, you're ready to choose a directory to delete.
 
-As it turns out, crab submarine engines don't burn fuel at a constant rate. Instead, each change of 1 step in horizontal position costs 1 more unit of fuel than the last: the first step costs 1, the second step costs 2, the third step costs 3, and so on.
+The total disk space available to the filesystem is 70000000. To run the update, you need unused space of at least 30000000. You need to find a directory you can delete that will free up enough space to run the update.
 
-As each crab moves, moving further becomes more expensive. This changes the best horizontal position to align them all on; in the example above, this becomes 5:
+In the example above, the total size of the outermost directory (and thus the total amount of used space) is 48381165; this means that the size of the unused space must currently be 21618835, which isn't quite the 30000000 required by the update. Therefore, the update still requires a directory with total size of at least 8381165 to be deleted before it can run.
 
-Move from 16 to 5: 66 fuel
-Move from 1 to 5: 10 fuel
-Move from 2 to 5: 6 fuel
-Move from 0 to 5: 15 fuel
-Move from 4 to 5: 1 fuel
-Move from 2 to 5: 6 fuel
-Move from 7 to 5: 3 fuel
-Move from 1 to 5: 10 fuel
-Move from 2 to 5: 6 fuel
-Move from 14 to 5: 45 fuel
-This costs a total of 168 fuel. This is the new cheapest possible outcome; the old alignment position (2) now costs 206 fuel instead.
+To achieve this, you have the following options:
 
-Determine the horizontal position that the crabs can align to using the least fuel possible so they can make you an escape route! How much fuel must they spend to align to that position?
+Delete directory e, which would increase unused space by 584.
+Delete directory a, which would increase unused space by 94853.
+Delete directory d, which would increase unused space by 24933642.
+Delete directory /, which would increase unused space by 48381165.
+Directories e and a are both too small; deleting them would not free up enough space. However, directories d and / are both big enough! Between these, choose the smallest: d, increasing unused space by 24933642.
 
-
+Find the smallest directory that, if deleted, would free up enough space on the filesystem to run the update. What is the total size of that directory?
 
 """
 
 
+@dataclass
+class File:
+    name: str
+    size: int
+
+    def get_size(self):
+        return self.size
+
+    def __hash__(self):
+        return hash(self.name)
+
+
+@dataclass
+class Directory:
+    name: str
+    parent: Directory
+    children: Set[Directory | File] = field(default_factory=set)
+
+    def get_size(self):
+        return sum((child.get_size() for child in self.children))
+
+    def __hash__(self):
+        return hash(self.name)
+
+
+def first(iterable):
+    return next(iter(iterable))
+
+
+def flatten(dir: Directory) -> List[Directory]:
+    directories = [dir]
+
+    for child in dir.children:
+        if isinstance(child, Directory):
+            directories.extend(flatten(child))
+    return directories
+
+
 def solve(input: List[str]):
-    crabs = list(map(int, input[0].split(",")))
-    max_position = max(crabs)
+    root = Directory("/", None)
+    cwd = root
 
-    best_fuel = (max_position * len(crabs)) ** 2
+    for line in input:
 
-    for position in range(max_position + 1):
+        if line.startswith("$ cd"):
+            name = line.removeprefix("$ cd ")
 
-        fuel = sum(sum(list(range(abs(crab - position) + 1))) for crab in crabs)
+            if name == "/":
+                continue
 
-        if fuel < best_fuel:
-            best_fuel = fuel
+            cwd = cwd.parent if name == ".." else first(filter(lambda child: child.name == name, cwd.children))
 
-    return best_fuel
+        elif line.startswith("dir"):
+
+            name = line.removeprefix("dir ")
+
+            directory = Directory(name, cwd)
+            cwd.children.add(directory)
+
+        elif first(line).isdigit():
+            size, name = line.split(" ")
+
+            file = File(name, int(size))
+            cwd.children.add(file)
+
+    required_space = max(30000000 - (70000000 - root.get_size()), 0)
+
+    return first(sorted(filter(lambda x: x >= required_space, (x.get_size() for x in flatten(root)))))

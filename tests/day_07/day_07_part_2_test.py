@@ -4,17 +4,39 @@ from utils import read_lines_from_comment, read_lines_from_file
 
 def test_day_07_part_2_example():
     example = """
-        16,1,2,0,4,2,7,1,2,14
+        $ cd /
+        $ ls
+        dir a
+        14848514 b.txt
+        8504156 c.dat
+        dir d
+        $ cd a
+        $ ls
+        dir e
+        29116 f
+        2557 g
+        62596 h.lst
+        $ cd e
+        $ ls
+        584 i
+        $ cd ..
+        $ cd ..
+        $ cd d
+        $ ls
+        4060174 j
+        8033020 d.log
+        5626152 d.ext
+        7214296 k
     """
 
     input = read_lines_from_comment(example)
     result = day_07_part_2.solve(input)
 
-    assert 168 == result
+    assert result == 24933642
 
 
 def test_day_07_part_2_problem():
     input = read_lines_from_file(".\\data\\day_07\\day_07_input.txt")
     result = day_07_part_2.solve(input)
 
-    assert 94017638 == result
+    assert result == 5974547
