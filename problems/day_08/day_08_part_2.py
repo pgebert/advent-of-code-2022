@@ -5,112 +5,75 @@ from typing import List
 https://adventofcode.com/2022/day/8
 
 --- Part Two ---
-Through a little deduction, you should now be able to determine the remaining digits. Consider again the first example above:
+Content with the amount of tree cover available, the Elves just need to know the best spot to build their tree house: they would like to be able to see a lot of trees.
 
-acedgfb cdfbe gcdfa fbcad dab cefabd cdfgeb eafb cagedb ab |
-cdfeb fcadb cdfeb cdbaf
-After some careful analysis, the mapping between signal wires and segments only make sense in the following configuration:
+To measure the viewing distance from a given tree, look up, down, left, and right from that tree; stop if you reach an edge or at the first tree that is the same height or taller than the tree under consideration. (If a tree is right on the edge, at least one of its viewing distances will be zero.)
 
- dddd
-e    a
-e    a
- ffff
-g    b
-g    b
- cccc
-So, the unique signal patterns would correspond to the following digits:
+The Elves don't care about distant trees taller than those found by the rules above; the proposed tree house has large eaves to keep it dry, so they wouldn't be able to see higher than the tree house anyway.
 
-acedgfb: 8
-cdfbe: 5
-gcdfa: 2
-fbcad: 3
-dab: 7
-cefabd: 9
-cdfgeb: 6
-eafb: 4
-cagedb: 0
-ab: 1
-Then, the four digits of the output value can be decoded:
+In the example above, consider the middle 5 in the second row:
 
-cdfeb: 5
-fcadb: 3
-cdfeb: 5
-cdbaf: 3
-Therefore, the output value for this entry is 5353.
+30373
+25512
+65332
+33549
+35390
+Looking up, its view is not blocked; it can see 1 tree (of height 3).
+Looking left, its view is blocked immediately; it can see only 1 tree (of height 5, right next to it).
+Looking right, its view is not blocked; it can see 2 trees.
+Looking down, its view is blocked eventually; it can see 2 trees (one of height 3, then the tree of height 5 that blocks its view).
+A tree's scenic score is found by multiplying together its viewing distance in each of the four directions. For this tree, this is 4 (found by multiplying 1 * 1 * 2 * 2).
 
-Following this same process for each entry in the second, larger example above, the output value of each entry can be determined:
+However, you can do even better: consider the tree of height 5 in the middle of the fourth row:
 
-fdgacbe cefdb cefbgd gcbe: 8394
-fcgedb cgb dgebacf gc: 9781
-cg cg fdcagb cbg: 1197
-efabcd cedba gadfec cb: 9361
-gecf egdcabf bgf bfgea: 4873
-gebdcfa ecba ca fadegcb: 8418
-cefg dcbef fcge gbcadfe: 4548
-ed bcgafe cdgba cbgef: 1625
-gbdfcae bgc cg cgb: 8717
-fgae cfgab fg bagce: 4315
-Adding all of the output values in this larger example produces 61229.
+30373
+25512
+65332
+33549
+35390
+Looking up, its view is blocked at 2 trees (by another tree with a height of 5).
+Looking left, its view is not blocked; it can see 2 trees.
+Looking down, its view is also not blocked; it can see 1 tree.
+Looking right, its view is blocked at 2 trees (by a massive tree of height 9).
+This tree's scenic score is 8 (2 * 2 * 1 * 2); this is the ideal spot for the tree house.
 
-For each entry, determine all of the wire/segment connections and decode the four-digit output values. What do you get if you add up all of the output values?
+Consider each tree on your map. What is the highest scenic score possible for any tree?
 
 """
 
 
-class Decoder:
-
-    def __init__(self, signals: List[str]):
-
-        self.one = None
-        self.four = None
-
-        self.one = next((signal for signal in signals if len(signal) == 2))
-        self.four = next((signal for signal in signals if len(signal) == 4))
-
-        assert self.one is not None
-        assert self.four is not None
-
-    def decode(self, signals: List[str]):
-
-        def get_size_intersection(a: str, b: str) -> int:
-            return len(set(a).intersection(b))
-
-        number_by_length = {2: 1, 4: 4, 3: 7, 7: 8}
-
-        decoded = []
-
-        for i, signal in enumerate(signals):
-
-            if (number := number_by_length.get(len(signal))) is not None:
-                decoded.append(number)
-            elif len(signal) == 6:
-                if get_size_intersection(signal, self.four) == 4:
-                    decoded.append(9)
-                elif get_size_intersection(signal, self.one) == 2:
-                    decoded.append(0)
-                else:
-                    decoded.append(6)
-            elif len(signal) == 5:
-                if get_size_intersection(signal, self.one) == 2:
-                    decoded.append(3)
-                elif get_size_intersection(signal, self.four) == 3:
-                    decoded.append(5)
-                else:
-                    decoded.append(2)
-
-        return decoded
+def count_to_max(max: int, l: List[int]) -> int:
+    count = 0
+    for i in range(len(l)):
+        count += 1
+        if l[i] >= max:
+            return count
+    return count
 
 
 def solve(input: List[str]):
-    result = 0
+    trees = [list(map(int, line)) for line in input]
 
-    for line in input:
-        front_part, back_part = line.split("|", 2)
-        front_part = front_part.split()
-        back_part = back_part.split()
+    max_score = 0
 
-        decoder = Decoder(front_part)
-        decoded = decoder.decode(back_part)
-        result += int("".join(map(str, decoded)))
+    for row in range(len(trees)):
+        for col in range(len(trees[row])):
 
-    return result
+            tree = trees[row][col]
+
+            top = [trees[i][col] for i in range(row)]
+            down = [trees[i][col] for i in range(row + 1, len(trees))]
+            left = trees[row][:col]
+            right = trees[row][col + 1:]
+
+            top_score = count_to_max(tree, top[::-1])
+            down_score = count_to_max(tree, down)
+            left_score = count_to_max(tree, left[::-1])
+            right_score = count_to_max(tree, right)
+
+            score = top_score * down_score * left_score * right_score
+
+            if score > max_score:
+                max_score = score
+
+    return max_score
