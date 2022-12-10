@@ -1,108 +1,220 @@
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List
 
 """
 
 https://adventofcode.com/2022/day/10
 
---- Day 10: Syntax Scoring ---
-You ask the submarine to determine the best route out of the deep-sea cave, but it only replies:
+--- Day 10: Cathode-Ray Tube ---
+You avoid the ropes, plunge into the river, and swim to shore.
 
-Syntax error in navigation subsystem on line: all of them
-All of them?! The damage is worse than you thought. You bring up a copy of the navigation subsystem (your puzzle input).
+The Elves yell something about meeting back up with them upriver, but the river is too loud to tell exactly what they're saying. They finish crossing the bridge and disappear from view.
 
-The navigation subsystem syntax is made of several lines containing chunks. There are one or more chunks on each line, and chunks contain zero or more other chunks. Adjacent chunks are not separated by any delimiter; if one chunk stops, the next chunk (if any) can immediately start. Every chunk must open and close with one of four legal pairs of matching characters:
+Situations like this must be why the Elves prioritized getting the communication system on your handheld device working. You pull it out of your pack, but the amount of water slowly draining from a big crack in its screen tells you it probably won't be of much immediate use.
 
-If a chunk opens with (, it must close with ).
-If a chunk opens with [, it must close with ].
-If a chunk opens with {, it must close with }.
-If a chunk opens with <, it must close with >.
-So, () is a legal chunk that contains no other chunks, as is []. More complex but valid chunks include ([]), {()()()}, <([{}])>, [<>({}){}[([])<>]], and even (((((((((()))))))))).
+Unless, that is, you can design a replacement for the device's video system! It seems to be some kind of cathode-ray tube screen and simple CPU that are both driven by a precise clock circuit. The clock circuit ticks at a constant rate; each tick is called a cycle.
 
-Some lines are incomplete, but others are corrupted. Find and discard the corrupted lines first.
+Start by figuring out the signal being sent by the CPU. The CPU has a single register, X, which starts with the value 1. It supports only two instructions:
 
-A corrupted line is one where a chunk closes with the wrong character - that is, where the characters it opens and closes with do not form one of the four legal pairs listed above.
+addx V takes two cycles to complete. After two cycles, the X register is increased by the value V. (V can be negative.)
+noop takes one cycle to complete. It has no other effect.
+The CPU uses these instructions in a program (your puzzle input) to, somehow, tell the screen what to draw.
 
-Examples of corrupted chunks include (], {()()()>, (((()))}, and <([]){()}[{}]). Such a chunk can appear anywhere within a line, and its presence causes the whole line to be considered corrupted.
+Consider the following small program:
 
-For example, consider the following navigation subsystem:
+noop
+addx 3
+addx -5
+Execution of this program proceeds as follows:
 
-[({(<(())[]>[[{[]{<()<>>
-[(()[<>])]({[<{<<[]>>(
-{([(<{}[<>[]}>{[]{[(<()>
-(((({<>}<{<{<>}{[]{[]{}
-[[<[([]))<([[{}[[()]]]
-[{[{({}]{}}([{[{{{}}([]
-{<[[]]>}<{[{[{[]{()[[[]
-[<(<(<(<{}))><([]([]()
-<{([([[(<>()){}]>(<<{{
-<{([{{}}[<[[[<>{}]]]>[]]
-Some of the lines aren't corrupted, just incomplete; you can ignore these lines for now. The remaining five lines are corrupted:
+At the start of the first cycle, the noop instruction begins execution. During the first cycle, X is 1. After the first cycle, the noop instruction finishes execution, doing nothing.
+At the start of the second cycle, the addx 3 instruction begins execution. During the second cycle, X is still 1.
+During the third cycle, X is still 1. After the third cycle, the addx 3 instruction finishes execution, setting X to 4.
+At the start of the fourth cycle, the addx -5 instruction begins execution. During the fourth cycle, X is still 4.
+During the fifth cycle, X is still 4. After the fifth cycle, the addx -5 instruction finishes execution, setting X to -1.
+Maybe you can learn something by looking at the value of the X register throughout execution. For now, consider the signal strength (the cycle number multiplied by the value of the X register) during the 20th cycle and every 40 cycles after that (that is, during the 20th, 60th, 100th, 140th, 180th, and 220th cycles).
 
-{([(<{}[<>[]}>{[]{[(<()> - Expected ], but found } instead.
-[[<[([]))<([[{}[[()]]] - Expected ], but found ) instead.
-[{[{({}]{}}([{[{{{}}([] - Expected ), but found ] instead.
-[<(<(<(<{}))><([]([]() - Expected >, but found ) instead.
-<{([([[(<>()){}]>(<<{{ - Expected ], but found > instead.
-Stop at the first incorrect closing character on each corrupted line.
+For example, consider this larger program:
 
-Did you know that syntax checkers actually have contests to see who can get the high score for syntax errors in a file? It's true! To calculate the syntax error score for a line, take the first illegal character on the line and look it up in the following table:
+addx 15
+addx -11
+addx 6
+addx -3
+addx 5
+addx -1
+addx -8
+addx 13
+addx 4
+noop
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx 5
+addx -1
+addx -35
+addx 1
+addx 24
+addx -19
+addx 1
+addx 16
+addx -11
+noop
+noop
+addx 21
+addx -15
+noop
+noop
+addx -3
+addx 9
+addx 1
+addx -3
+addx 8
+addx 1
+addx 5
+noop
+noop
+noop
+noop
+noop
+addx -36
+noop
+addx 1
+addx 7
+noop
+noop
+noop
+addx 2
+addx 6
+noop
+noop
+noop
+noop
+noop
+addx 1
+noop
+noop
+addx 7
+addx 1
+noop
+addx -13
+addx 13
+addx 7
+noop
+addx 1
+addx -33
+noop
+noop
+noop
+addx 2
+noop
+noop
+noop
+addx 8
+noop
+addx -1
+addx 2
+addx 1
+noop
+addx 17
+addx -9
+addx 1
+addx 1
+addx -3
+addx 11
+noop
+noop
+addx 1
+noop
+addx 1
+noop
+noop
+addx -13
+addx -19
+addx 1
+addx 3
+addx 26
+addx -30
+addx 12
+addx -1
+addx 3
+addx 1
+noop
+noop
+noop
+addx -9
+addx 18
+addx 1
+addx 2
+noop
+noop
+addx 9
+noop
+noop
+noop
+addx -1
+addx 2
+addx -37
+addx 1
+addx 3
+noop
+addx 15
+addx -21
+addx 22
+addx -6
+addx 1
+noop
+addx 2
+addx 1
+noop
+addx -10
+noop
+noop
+addx 20
+addx 1
+addx 2
+addx 2
+addx -6
+addx -11
+noop
+noop
+noop
+The interesting signal strengths can be determined as follows:
 
-): 3 points.
-]: 57 points.
-}: 1197 points.
->: 25137 points.
-In the above example, an illegal ) was found twice (2*3 = 6 points), an illegal ] was found once (57 points), an illegal } was found once (1197 points), and an illegal > was found once (25137 points). So, the total syntax error score for this file is 6+57+1197+25137 = 26397 points!
+During the 20th cycle, register X has the value 21, so the signal strength is 20 * 21 = 420. (The 20th cycle occurs in the middle of the second addx -1, so the value of register X is the starting value, 1, plus all of the other addx values up to that point: 1 + 15 - 11 + 6 - 3 + 5 - 1 - 8 + 13 + 4 = 21.)
+During the 60th cycle, register X has the value 19, so the signal strength is 60 * 19 = 1140.
+During the 100th cycle, register X has the value 18, so the signal strength is 100 * 18 = 1800.
+During the 140th cycle, register X has the value 21, so the signal strength is 140 * 21 = 2940.
+During the 180th cycle, register X has the value 16, so the signal strength is 180 * 16 = 2880.
+During the 220th cycle, register X has the value 18, so the signal strength is 220 * 18 = 3960.
+The sum of these signal strengths is 13140.
 
-Find the first illegal character in each corrupted line of the navigation subsystem. What is the total syntax error score for those errors?
+Find the signal strength during the 20th, 60th, 100th, 140th, 180th, and 220th cycles. What is the sum of these six signal strengths?
 
 """
 
 
-@dataclass
-class Block:
-    character: Optional[str] = None
-    parent: Optional[Block] = None
-    children: List[Block] = field(default_factory=list)
-
-
-def find_corrputed(line: str) -> str:
-    root = Block()
-    pointer = root
-
-    opening_characters = ["(", "[", "{", "<"]
-    closing_characters = [")", "]", "}", ">"]
-
-    closing_by_opening = {opening: closing for opening, closing in zip(opening_characters, closing_characters)}
-
-    for character in line:
-
-        # open block
-        if character in opening_characters:
-            new_block = Block(character=character, parent=pointer)
-            pointer.children.append(new_block)
-            pointer = new_block
-        # close block
-        elif character in closing_characters:
-
-            # corrupted
-            if character != closing_by_opening.get(pointer.character):
-                return character
-                # to many closing characters
-            elif pointer is None:
-                pass
-
-            pointer = pointer.parent
-
-
 def solve(input: List[str]):
-    character_to_points = {")": 3, "]": 57, "}": 1197, ">": 25137}
+    x = 1
+    cycle = 0
+    signal_cycles = [20, 60, 100, 140, 180, 220]
 
-    points = 0
+    signal_strength = []
+
     for line in input:
-        corrupted = find_corrputed(line)
-        if corrupted is not None:
-            points += character_to_points.get(corrupted, 0)
-    return points
+
+        cycle += 1 if line.startswith("noop") else 2
+
+        if cycle in signal_cycles:
+            signal_strength.append(cycle * x)
+        elif cycle - 1 in signal_cycles and line.startswith("add"):
+            signal_strength.append((cycle - 1) * x)
+
+        if line.startswith("add"):
+            x += int(line.split(" ")[1])
+
+    return sum(signal_strength)
