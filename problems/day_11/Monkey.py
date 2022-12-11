@@ -15,6 +15,15 @@ class Monkey:
     monkeys: List[Monkey]
     inspections: int = 0
 
+    def __init__(self, input: List[str], monkeys: List[Monkey]):
+        self.name = input[0][:-1]
+        self.items = list(map(int, input[1].replace("Starting items:", "").strip().split(", ")))
+        self.compute_worry_level_string = input[2].replace("Operation: new =", "").strip()
+        self.test_item_string = input[3].replace("Test: divisible by", "").strip()
+        self.receiver_name_1 = input[4].replace("If true: throw to", "").strip()
+        self.receiver_name_2 = input[5].replace("If false: throw to", "").strip()
+        self.monkeys = monkeys
+
     def compute_worry_level(self, old: int) -> int:
         self.inspections += 1
         return eval(self.compute_worry_level_string)
