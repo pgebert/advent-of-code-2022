@@ -1,11 +1,3 @@
-"""
-
-https://adventofcode.com/2022/day/12
-
-
-
-"""
-
 import string
 from sys import maxsize
 from typing import List
@@ -66,9 +58,3 @@ class Area:
 
         destination_row, destination_col = self.destination
         return cost[destination_row][destination_col]
-
-
-def solve(input: List[str]):
-    area = Area(input)
-    path = area.cost_to_destionation()
-    return path
