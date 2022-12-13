@@ -2,15 +2,11 @@ def compare(left, right) -> int:
     if type(left) == int and type(right) == int:
         return right - left
 
-    if type(left) != list:
-        left = [left]
-    if type(right) != list:
-        right = [right]
+    left = [left] if type(left) != list else left
+    right = [right] if type(right) != list else right
 
     for a, b in zip(left, right):
-        comparison = compare(a, b)
-
-        if comparison != 0:
-            return comparison
+        if (result := compare(a, b)) != 0:
+            return result
 
     return len(right) - len(left)
