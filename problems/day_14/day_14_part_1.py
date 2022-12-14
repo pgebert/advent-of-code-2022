@@ -1,64 +1,178 @@
 from typing import List
 
-from .polymer import Polymer
-
 """
 
 https://adventofcode.com/2022/day/14
 
---- Day 14: Extended Polymerization ---
-The incredible pressures at this depth are starting to put a strain on your submarine. The submarine has polymerization equipment that would produce suitable materials to reinforce the submarine, and the nearby volcanically-active caves should even have the necessary input elements in sufficient quantities.
+--- Day 14: Regolith Reservoir ---
+The distress signal leads you to a giant waterfall! Actually, hang on - the signal seems like it's coming from the waterfall itself, and that doesn't make any sense. However, you do notice a little path that leads behind the waterfall.
 
-The submarine manual contains instructions for finding the optimal polymer formula; specifically, it offers a polymer template and a list of pair insertion rules (your puzzle input). You just need to work out what polymer would result after repeating the pair insertion process a few times.
+Correction: the distress signal leads you behind a giant waterfall! There seems to be a large cave system here, and the signal definitely leads further inside.
 
-For example:
+As you begin to make your way deeper underground, you feel the ground rumble for a moment. Sand begins pouring into the cave! If you don't quickly figure out where the sand is going, you could quickly become trapped!
 
-NNCB
+Fortunately, your familiarity with analyzing the path of falling material will come in handy here. You scan a two-dimensional vertical slice of the cave above you (your puzzle input) and discover that it is mostly air with structures made of rock.
 
-CH -> B
-HH -> N
-CB -> H
-NH -> C
-HB -> C
-HC -> B
-HN -> C
-NN -> C
-BH -> H
-NC -> B
-NB -> B
-BN -> B
-BB -> N
-BC -> B
-CC -> N
-CN -> C
-The first line is the polymer template - this is the starting point of the process.
+Your scan traces the path of each solid rock structure and reports the x,y coordinates that form the shape of the path, where x represents distance to the right and y represents distance down. Each path appears as a single line of text in your scan. After the first point of each path, each point indicates the end of a straight horizontal or vertical line to be drawn from the previous point. For example:
 
-The following section defines the pair insertion rules. A rule like AB -> C means that when elements A and B are immediately adjacent, element C should be inserted between them. These insertions all happen simultaneously.
+498,4 -> 498,6 -> 496,6
+503,4 -> 502,4 -> 502,9 -> 494,9
+This scan means that there are two paths of rock; the first path consists of two straight lines, and the second path consists of three straight lines. (Specifically, the first path consists of a line of rock from 498,4 through 498,6 and another line of rock from 498,6 through 496,6.)
 
-So, starting with the polymer template NNCB, the first step simultaneously considers all three pairs:
+The sand is pouring into the cave from point 500,0.
 
-The first pair (NN) matches the rule NN -> C, so element C is inserted between the first N and the second N.
-The second pair (NC) matches the rule NC -> B, so element B is inserted between the N and the C.
-The third pair (CB) matches the rule CB -> H, so element H is inserted between the C and the B.
-Note that these pairs overlap: the second element of one pair is the first element of the next pair. Also, because all pairs are considered simultaneously, inserted elements are not considered to be part of a pair until the next step.
+Drawing rock as #, air as ., and the source of the sand as +, this becomes:
 
-After the first step of this process, the polymer becomes NCNBCHB.
 
-Here are the results of a few steps using the above rules:
+  4     5  5
+  9     0  0
+  4     0  3
+0 ......+...
+1 ..........
+2 ..........
+3 ..........
+4 ....#...##
+5 ....#...#.
+6 ..###...#.
+7 ........#.
+8 ........#.
+9 #########.
+Sand is produced one unit at a time, and the next unit of sand is not produced until the previous unit of sand comes to rest. A unit of sand is large enough to fill one tile of air in your scan.
 
-Template:     NNCB
-After step 1: NCNBCHB
-After step 2: NBCCNBBBCBHCB
-After step 3: NBBBCNCCNBBNBNBBCHBHHBCHB
-After step 4: NBBNBNBBCCNBCNCCNBBNBBNBBBNBBNBBCBHCBHHNHCBBCBHCB
-This polymer grows quickly. After step 5, it has length 97; After step 10, it has length 3073. After step 10, B occurs 1749 times, C occurs 298 times, H occurs 161 times, and N occurs 865 times; taking the quantity of the most common element (B, 1749) and subtracting the quantity of the least common element (H, 161) produces 1749 - 161 = 1588.
+A unit of sand always falls down one step if possible. If the tile immediately below is blocked (by rock or sand), the unit of sand attempts to instead move diagonally one step down and to the left. If that tile is blocked, the unit of sand attempts to instead move diagonally one step down and to the right. Sand keeps moving as long as it is able to do so, at each step trying to move down, then down-left, then down-right. If all three possible destinations are blocked, the unit of sand comes to rest and no longer moves, at which point the next unit of sand is created back at the source.
 
-Apply 10 steps of pair insertion to the polymer template and find the most and least common elements in the result. What do you get if you take the quantity of the most common element and subtract the quantity of the least common element?
+So, drawing sand that has come to rest as o, the first unit of sand simply falls straight down and then stops:
+
+......+...
+..........
+..........
+..........
+....#...##
+....#...#.
+..###...#.
+........#.
+......o.#.
+#########.
+The second unit of sand then falls straight down, lands on the first one, and then comes to rest to its left:
+
+......+...
+..........
+..........
+..........
+....#...##
+....#...#.
+..###...#.
+........#.
+.....oo.#.
+#########.
+After a total of five units of sand have come to rest, they form this pattern:
+
+......+...
+..........
+..........
+..........
+....#...##
+....#...#.
+..###...#.
+......o.#.
+....oooo#.
+#########.
+After a total of 22 units of sand:
+
+......+...
+..........
+......o...
+.....ooo..
+....#ooo##
+....#ooo#.
+..###ooo#.
+....oooo#.
+...ooooo#.
+#########.
+Finally, only two more units of sand can possibly come to rest:
+
+......+...
+..........
+......o...
+.....ooo..
+....#ooo##
+...o#ooo#.
+..###ooo#.
+....oooo#.
+.o.ooooo#.
+#########.
+Once all 24 units of sand shown above have come to rest, all further sand flows out the bottom, falling into the endless void. Just for fun, the path any new sand takes before falling forever is shown here with ~:
+
+.......+...
+.......~...
+......~o...
+.....~ooo..
+....~#ooo##
+...~o#ooo#.
+..~###ooo#.
+..~..oooo#.
+.~o.ooooo#.
+~#########.
+~..........
+~..........
+~..........
+Using your scan, simulate the falling sand. How many units of sand come to rest before sand starts flowing into the abyss below?
 
 
 """
 
 
+def print_cave(rock, sand):
+    for y in range(0, max([y for x, y in rock]) + 1):
+        row = []
+        for x in range(min([x for x, y in rock]), max([x for x, y in rock]) + 1):
+
+            if (x, y) in rock:
+                row.append("#")
+            elif (x, y) in sand:
+                row.append("o")
+            else:
+                row.append(".")
+        print("".join(row))
+
+
 def solve(input: List[str]):
-    most_common, least_common = Polymer(input).evolve(10)
-    return most_common - least_common
+    sand = set()
+    rock = set()
+
+    for line in input:
+        source = (None, None)
+        for point in line.split(" -> "):
+            target = tuple(map(int, point.split(",")))
+            rock.add(target)
+
+            if source[0] == target[0]:
+                for y in range(min(source[1], target[1]), max(source[1], target[1])):
+                    rock.add((source[0], y))
+            elif source[1] == target[1]:
+                for x in range(min(source[0], target[0]), max(source[0], target[0])):
+                    rock.add((x, source[1]))
+
+            source = target
+
+    x, y = 500, -1
+    LIMIT = max([y for x, y in rock])
+    while y <= LIMIT:
+
+        if (x, y + 1) in rock.union(sand):
+            # try left
+            if (x - 1, y + 1) not in rock.union(sand):
+                x, y = x - 1, y + 1
+            # try right
+            elif (x + 1, y + 1) not in rock.union(sand):
+                x, y = x + 1, y + 1
+            # stuck
+            else:
+                sand.add((x, y))
+                x, y = 500, -1
+        else:
+            x, y = x, y + 1
+
+    # print_cave(rock, sand)
+
+    return len(sand)
