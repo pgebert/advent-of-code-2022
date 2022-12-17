@@ -4,26 +4,30 @@ from utils import read_lines_from_comment, read_lines_from_file
 
 def test_day_15_part_1_example():
     example = """
-        1163751742
-        1381373672
-        2136511328
-        3694931569
-        7463417111
-        1319128137
-        1359912421
-        3125421639
-        1293138521
-        2311944581
+    Sensor at x=2, y=18: closest beacon is at x=-2, y=15
+    Sensor at x=9, y=16: closest beacon is at x=10, y=16
+    Sensor at x=13, y=2: closest beacon is at x=15, y=3
+    Sensor at x=12, y=14: closest beacon is at x=10, y=16
+    Sensor at x=10, y=20: closest beacon is at x=10, y=16
+    Sensor at x=14, y=17: closest beacon is at x=10, y=16
+    Sensor at x=8, y=7: closest beacon is at x=2, y=10
+    Sensor at x=2, y=0: closest beacon is at x=2, y=10
+    Sensor at x=0, y=11: closest beacon is at x=2, y=10
+    Sensor at x=20, y=14: closest beacon is at x=25, y=17
+    Sensor at x=17, y=20: closest beacon is at x=21, y=22
+    Sensor at x=16, y=7: closest beacon is at x=15, y=3
+    Sensor at x=14, y=3: closest beacon is at x=15, y=3
+    Sensor at x=20, y=1: closest beacon is at x=15, y=3
     """
 
     input = read_lines_from_comment(example)
-    result = day_15_part_1.solve(input)
+    result = day_15_part_1.solve(input, y=10)
 
-    assert 40 == result
+    assert result == 26
 
 
 def test_day_15_part_1_problem():
     input = read_lines_from_file(".\\data\\day_15\\day_15_input.txt")
-    result = day_15_part_1.solve(input)
+    result = day_15_part_1.solve(input, y=2000000)
 
-    assert 602 == result
+    assert result == 4717631
