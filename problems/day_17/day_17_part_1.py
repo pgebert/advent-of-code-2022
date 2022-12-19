@@ -1,126 +1,422 @@
 from __future__ import annotations
 
-from typing import List
-
-from .point import Point
-from .probe import Probe
+from typing import List, Tuple, Set, Iterator
 
 """
 
 https://adventofcode.com/2022/day/17
 
---- Day 17: Trick Shot ---
-You finally decode the Elves' message. HI, the message says. You continue searching for the sleigh keys.
+--- Day 17: Pyroclastic Flow ---
+Your handheld device has located an alternative exit from the cave for you and the elephants. The ground is rumbling almost continuously now, but the strange valves bought you some time. It's definitely getting warmer in here, though.
 
-Ahead of you is what appears to be a large ocean trench. Could the keys have fallen into it? You'd better send a probe to investigate.
+The tunnels eventually open into a very tall, narrow chamber. Large, oddly-shaped rocks are falling into the chamber from above, presumably due to all the rumbling. If you can't work out where the rocks will fall next, you might be crushed!
 
-The probe launcher on your submarine can fire the probe with any integer velocity in the x (forward) and y (upward, or downward if negative) directions. For example, an initial x,y velocity like 0,10 would fire the probe straight up, while an initial velocity like 10,-1 would fire the probe forward at a slight downward angle.
+The five types of rocks have the following peculiar shapes, where # is rock and . is empty space:
 
-The probe's x,y position starts at 0,0. Then, it will follow some trajectory by moving in steps. On each step, these changes occur in the following order:
+####
 
-The probe's x position increases by its x velocity.
-The probe's y position increases by its y velocity.
-Due to drag, the probe's x velocity changes by 1 toward the value 0; that is, it decreases by 1 if it is greater than 0, increases by 1 if it is less than 0, or does not change if it is already 0.
-Due to gravity, the probe's y velocity decreases by 1.
-For the probe to successfully make it into the trench, the probe must be on some trajectory that causes it to be within a target area after any step. The submarine computer has already calculated this target area (your puzzle input). For example:
+.#.
+###
+.#.
 
-target area: x=20..30, y=-10..-5
-This target area means that you need to find initial x,y velocity values such that after any step, the probe's x position is at least 20 and at most 30, and the probe's y position is at least -10 and at most -5.
+..#
+..#
+###
 
-Given this target area, one initial velocity that causes the probe to be within the target area after any step is 7,2:
+#
+#
+#
+#
 
-.............#....#............
-.......#..............#........
-...............................
-S........................#.....
-...............................
-...............................
-...........................#...
-...............................
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................TTTTTTTT#TT
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-In this diagram, S is the probe's initial position, 0,0. The x coordinate increases to the right, and the y coordinate increases upward. In the bottom right, positions that are within the target area are shown as T. After each step (until the target area is reached), the position of the probe is marked with #. (The bottom-right # is both a position the probe reaches and a position in the target area.)
+##
+##
+The rocks fall in the order shown above: first the - shape, then the + shape, and so on. Once the end of the list is reached, the same order repeats: the - shape falls first, sixth, 11th, 16th, etc.
 
-Another initial velocity that causes the probe to be within the target area after any step is 6,3:
+The rocks don't spin, but they do get pushed around by jets of hot gas coming out of the walls themselves. A quick scan reveals the effect the jets of hot gas will have on the rocks as they fall (your puzzle input).
 
-...............#..#............
-...........#........#..........
-...............................
-......#..............#.........
-...............................
-...............................
-S....................#.........
-...............................
-...............................
-...............................
-.....................#.........
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................T#TTTTTTTTT
-....................TTTTTTTTTTT
-Another one is 9,0:
+For example, suppose this was the jet pattern in your cave:
 
-S........#.....................
-.................#.............
-...............................
-........................#......
-...............................
-....................TTTTTTTTTTT
-....................TTTTTTTTTT#
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-....................TTTTTTTTTTT
-One initial velocity that doesn't cause the probe to be within the target area after any step is 17,-4:
+>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>
+In jet patterns, < means a push to the left, while > means a push to the right. The pattern above means that the jets will push a falling rock right, then right, then right, then left, then left, then right, and so on. If the end of the list is reached, it repeats.
 
-S..............................................................
-...............................................................
-...............................................................
-...............................................................
-.................#.............................................
-....................TTTTTTTTTTT................................
-....................TTTTTTTTTTT................................
-....................TTTTTTTTTTT................................
-....................TTTTTTTTTTT................................
-....................TTTTTTTTTTT..#.............................
-....................TTTTTTTTTTT................................
-...............................................................
-...............................................................
-...............................................................
-...............................................................
-................................................#..............
-...............................................................
-...............................................................
-...............................................................
-...............................................................
-...............................................................
-...............................................................
-..............................................................#
-The probe appears to pass through the target area, but is never within it after any step. Instead, it continues down and to the right - only the first few steps are shown.
+The tall, vertical chamber is exactly seven units wide. Each rock appears so that its left edge is two units away from the left wall and its bottom edge is three units above the highest rock in the room (or the floor, if there isn't one).
 
-If you're going to fire a highly scientific probe out of a super cool probe launcher, you might as well do it with style. How high can you make the probe go while still reaching the target area?
+After a rock appears, it alternates between being pushed by a jet of hot gas one unit (in the direction indicated by the next symbol in the jet pattern) and then falling one unit down. If any movement would cause any part of the rock to move into the walls, floor, or a stopped rock, the movement instead does not occur. If a downward movement would have caused a falling rock to move into the floor or an already-fallen rock, the falling rock stops where it is (having landed on something) and a new rock immediately begins falling.
 
-In the above example, using an initial velocity of 6,9 is the best you can do, causing the probe to reach a maximum y position of 45. (Any higher initial y velocity causes the probe to overshoot the target area entirely.)
+Drawing falling rocks with @ and stopped rocks with #, the jet pattern in the example above manifests as follows:
 
-Find the initial velocity that causes the probe to reach the highest y position and still eventually be within the target area after any step. What is the highest y position it reaches on this trajectory?
+The first rock begins falling:
+|..@@@@.|
+|.......|
+|.......|
+|.......|
++-------+
 
+Jet of gas pushes rock right:
+|...@@@@|
+|.......|
+|.......|
+|.......|
++-------+
+
+Rock falls 1 unit:
+|...@@@@|
+|.......|
+|.......|
++-------+
+
+Jet of gas pushes rock right, but nothing happens:
+|...@@@@|
+|.......|
+|.......|
++-------+
+
+Rock falls 1 unit:
+|...@@@@|
+|.......|
++-------+
+
+Jet of gas pushes rock right, but nothing happens:
+|...@@@@|
+|.......|
++-------+
+
+Rock falls 1 unit:
+|...@@@@|
++-------+
+
+Jet of gas pushes rock left:
+|..@@@@.|
++-------+
+
+Rock falls 1 unit, causing it to come to rest:
+|..####.|
++-------+
+
+A new rock begins falling:
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Jet of gas pushes rock left:
+|..@....|
+|.@@@...|
+|..@....|
+|.......|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Rock falls 1 unit:
+|..@....|
+|.@@@...|
+|..@....|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Jet of gas pushes rock right:
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Rock falls 1 unit:
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|..####.|
++-------+
+
+Jet of gas pushes rock left:
+|..@....|
+|.@@@...|
+|..@....|
+|.......|
+|..####.|
++-------+
+
+Rock falls 1 unit:
+|..@....|
+|.@@@...|
+|..@....|
+|..####.|
++-------+
+
+Jet of gas pushes rock right:
+|...@...|
+|..@@@..|
+|...@...|
+|..####.|
++-------+
+
+Rock falls 1 unit, causing it to come to rest:
+|...#...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+A new rock begins falling:
+|....@..|
+|....@..|
+|..@@@..|
+|.......|
+|.......|
+|.......|
+|...#...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+The moment each of the next few rocks begins falling, you would see this:
+
+|..@....|
+|..@....|
+|..@....|
+|..@....|
+|.......|
+|.......|
+|.......|
+|..#....|
+|..#....|
+|####...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@...|
+|..@@...|
+|.......|
+|.......|
+|.......|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@@@.|
+|.......|
+|.......|
+|.......|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|
+|.......|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|....@..|
+|....@..|
+|..@@@..|
+|.......|
+|.......|
+|.......|
+|..#....|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@....|
+|..@....|
+|..@....|
+|..@....|
+|.......|
+|.......|
+|.......|
+|.....#.|
+|.....#.|
+|..####.|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@...|
+|..@@...|
+|.......|
+|.......|
+|.......|
+|....#..|
+|....#..|
+|....##.|
+|....##.|
+|..####.|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@@@.|
+|.......|
+|.......|
+|.......|
+|....#..|
+|....#..|
+|....##.|
+|##..##.|
+|######.|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+To prove to the elephants your simulation is accurate, they want to know how tall the tower will get after 2022 rocks have stopped (but before the 2023rd rock begins falling). In this example, the tower of rocks will be 3068 units tall.
+
+How many units tall will the tower of rocks be after 2022 rocks have stopped falling?
 
 
 """
 
 
-def solve(input: List[str]):
-    input = input[0].split(" ")
-    x = list(map(int, input[2][2:-1].split("..")))
-    y = list(map(int, input[3][2:].split("..")))
+def part_factory() -> Iterator[Set[Tuple[int, int]]]:
+    horizontal_line = {(0, 3), (0, 4), (0, 5), (0, 6)}
+    plus = {(0, 4), (1, 3), (1, 4), (1, 5), (2, 4)}
+    reverse_l = {(0, 3), (0, 4), (0, 5), (1, 5), (2, 5)}
+    vertical_line = {(0, 3), (1, 3), (2, 3), (3, 3)}
+    block = {(0, 3), (1, 3), (0, 4), (1, 4)}
 
-    probe = Probe(Point(min(x), min(y)), Point(max(x), max(y)))
-    max_height = probe.get_maximum_height()
+    parts = [horizontal_line, plus, reverse_l, vertical_line, block]
+
+    i = 0
+    while True:
+        yield parts[i % len(parts)]
+        i += 1
+
+
+def solve(input: List[str]):
+    new_parts = part_factory()
+    current_part = {(y + 4, x) for y, x in next(new_parts)}
+    resting_parts = []
+
+    # print("\n")
+
+    step = 0
+    max_height = 0
+
+    while len(resting_parts) < 2022:
+
+        # if step > 60:
+        #     break
+
+        character = input[0][step % len(input[0])]
+
+        side_movement = 1 if character == ">" else -1
+        new_position = {(y, x + side_movement) for y, x in current_part}
+
+        if all(0 < x < 8 for y, x in new_position) \
+                and all(len(new_position.intersection(part)) == 0 for part in resting_parts):
+            current_part = new_position
+
+        down_movement = -1
+        new_position = {(y + down_movement, x) for y, x in current_part}
+
+        if all(y > 0 for y, x in new_position) \
+                and all(len(new_position.intersection(part)) == 0 for part in resting_parts):
+            current_part = new_position
+        else:
+            resting_parts.append(current_part)
+
+            if (new_max_height := max(y for y, x in current_part)) > max_height:
+                max_height = new_max_height
+
+            current_part = {(y + max_height + 4, x) for y, x in next(new_parts)}
+
+        # print(f"---- After step {step + 1} ({character})----")
+        #
+        # for y in range(max_height + 8, 0, -1):
+        #     row = ["|"]
+        #     for x in range(1, 8):
+        #         if (y, x) in current_part:
+        #             row.append("@")
+        #         elif (y, x) in (position for part in resting_parts for position in part):
+        #             row.append("#")
+        #         else:
+        #             row.append(".")
+        #     row.append("|")
+        #     print("".join(row))
+        #
+        # floor = ["+", "-", "-", "-", "-", "-", "-", "-", "+"]
+        # print("".join(floor))
+        # print(f"New max height: {max_height}")
+
+        # print(f"Current part: {current_part}")
+        # print(f"Resting parts: {resting_parts}")
+
+        step += 1
 
     return max_height
