@@ -80,8 +80,7 @@ def solve(input: List[str]):
         cube = queue.get()
 
         if cube in visited \
-                or not all(min_limit <= coord <= max_limit for min_limit, max_limit, coord in
-                           zip(mins, maxs, (cube.x, cube.y, cube.z))):
+                or not all(_min <= coord <= _max for _min, _max, coord in zip(mins, maxs, (cube.x, cube.y, cube.z))):
             continue
 
         if cube in cubes:
