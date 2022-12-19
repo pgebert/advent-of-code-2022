@@ -1,46 +1,95 @@
-from itertools import permutations
-from typing import List
+from __future__ import annotations
 
-from .number import Number
+from dataclasses import dataclass
+from queue import Queue
+from typing import List
 
 """
 
 https://adventofcode.com/2022/day/18
 
+--- Day 18: Boiling Boulders ---
+You and the elephants finally reach fresh air. You've emerged near the base of a large volcano that seems to be actively erupting! Fortunately, the lava seems to be flowing away from you and toward the ocean.
+
+Bits of lava are still being ejected toward you, so you're sheltering in the cavern exit a little longer. Outside the cave, you can see the lava landing in a pond and hear it loudly hissing as it solidifies.
+
+Depending on the specific compounds in the lava and speed at which it cools, it might be forming obsidian! The cooling rate should be based on the surface area of the lava droplets, so you take a quick scan of a droplet as it flies past you (your puzzle input).
+
+Because of how quickly the lava is moving, the scan isn't very good; its resolution is quite low and, as a result, it approximates the shape of the lava droplet with 1x1x1 cubes on a 3D grid, each given as its x,y,z position.
+
+To approximate the surface area, count the number of sides of each cube that are not immediately connected to another cube. So, if your scan were only two adjacent cubes like 1,1,1 and 2,1,1, each cube would have a single side covered and five sides exposed, a total surface area of 10 sides.
+
+Here's a larger example:
+
+2,2,2
+1,2,2
+3,2,2
+2,1,2
+2,3,2
+2,2,1
+2,2,3
+2,2,4
+2,2,6
+1,2,5
+3,2,5
+2,1,5
+2,3,5
+In the above example, after counting up all the sides that aren't connected to another cube, the total surface area is 64.
+
+What is the surface area of your scanned lava droplet?
+
+Your puzzle answer was 4320.
+
 --- Part Two ---
-You notice a second question on the back of the homework assignment:
+Something seems off about your calculation. The cooling rate depends on exterior surface area, but your calculation also included the surface area of air pockets trapped in the lava droplet.
 
-What is the largest magnitude you can get from adding only two of the snailfish numbers?
+Instead, consider only cube sides that could be reached by the water and steam as the lava droplet tumbles into the pond. The steam will expand to reach as much as possible, completely displacing any air on the outside of the lava droplet but never expanding diagonally.
 
-Note that snailfish addition is not commutative - that is, x + y and y + x can produce different results.
+In the larger example above, exactly one cube of air is trapped within the lava droplet (at 2,2,5), so the exterior surface area of the lava droplet is 58.
 
-Again considering the last example homework assignment above:
-
-[[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
-[[[5,[2,8]],4],[5,[[9,9],0]]]
-[6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
-[[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
-[[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
-[[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
-[[[[5,4],[7,7]],8],[[8,3],8]]
-[[9,3],[[9,9],[6,[4,9]]]]
-[[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
-[[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
-The largest magnitude of the sum of any two snailfish numbers in this list is 3993. This is the magnitude of [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]] + [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]], which reduces to [[[[7,8],[6,6]],[[6,0],[7,7]]],[[[7,8],[8,8]],[[7,9],[0,6]]]].
-
-What is the largest magnitude of any sum of two different snailfish numbers from the homework assignment?
+What is the exterior surface area of your scanned lava droplet?
 
 
 """
 
 
+@dataclass(unsafe_hash=True)
+class Cube:
+    x: int
+    y: int
+    z: int
+
+
 def solve(input: List[str]):
-    max_result = 0
+    cubes = [Cube(*map(int, line.split(","))) for line in input]
+    visible = 0
+    mins = [min(x) - 1 for x in zip(*((cube.x, cube.y, cube.z) for cube in cubes))]
+    maxs = [max(x) + 1 for x in zip(*((cube.x, cube.y, cube.z) for cube in cubes))]
+    start = Cube(*mins)
 
-    for a, b in permutations(input, 2):
+    def neighbours(cube: Cube):
+        x, y, z = cube.x, cube.y, cube.z
+        yield from (Cube(x + 1, y, z), Cube(x, y + 1, z), Cube(x, y, z + 1),
+                    Cube(x - 1, y, z), Cube(x, y - 1, z), Cube(x, y, z - 1))
 
-        result = (Number(eval(a)) + Number(eval(b))).magnitude()
-        if result > max_result:
-            max_result = result
+    queue = Queue()
+    queue.put(start)
+    visited = set()
 
-    return max_result
+    while queue.qsize() > 0:
+        cube = queue.get()
+
+        if cube in visited \
+                or not all(min_limit <= coord <= max_limit for min_limit, max_limit, coord in
+                           zip(mins, maxs, (cube.x, cube.y, cube.z))):
+            continue
+
+        if cube in cubes:
+            visible += 1
+            continue
+
+        for neighbour in neighbours(cube):
+            queue.put(neighbour)
+        visited.add(cube)
+
+    return visible
