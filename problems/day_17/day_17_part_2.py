@@ -1,44 +1,436 @@
-from typing import List
+from __future__ import annotations
 
-from .point import Point
-from .probe import Probe
+from typing import List, Tuple, Set, Iterator
 
 """
 
 https://adventofcode.com/2022/day/17
 
---- Part Two ---
-Maybe a fancy trick shot isn't the best idea; after all, you only have one probe, so you had better not miss.
+--- Day 17: Pyroclastic Flow ---
+Your handheld device has located an alternative exit from the cave for you and the elephants. The ground is rumbling almost continuously now, but the strange valves bought you some time. It's definitely getting warmer in here, though.
 
-To get the best idea of what your options are for launching the probe, you need to find every initial velocity that causes the probe to eventually be within the target area after any step.
+The tunnels eventually open into a very tall, narrow chamber. Large, oddly-shaped rocks are falling into the chamber from above, presumably due to all the rumbling. If you can't work out where the rocks will fall next, you might be crushed!
 
-In the above example, there are 112 different initial velocity values that meet these criteria:
+The five types of rocks have the following peculiar shapes, where # is rock and . is empty space:
 
-23,-10  25,-9   27,-5   29,-6   22,-6   21,-7   9,0     27,-7   24,-5
-25,-7   26,-6   25,-5   6,8     11,-2   20,-5   29,-10  6,3     28,-7
-8,0     30,-6   29,-8   20,-10  6,7     6,4     6,1     14,-4   21,-6
-26,-10  7,-1    7,7     8,-1    21,-9   6,2     20,-7   30,-10  14,-3
-20,-8   13,-2   7,3     28,-8   29,-9   15,-3   22,-5   26,-8   25,-8
-25,-6   15,-4   9,-2    15,-2   12,-2   28,-9   12,-3   24,-6   23,-7
-25,-10  7,8     11,-3   26,-7   7,1     23,-9   6,0     22,-10  27,-6
-8,1     22,-8   13,-4   7,6     28,-6   11,-4   12,-4   26,-9   7,4
-24,-10  23,-8   30,-8   7,0     9,-1    10,-1   26,-5   22,-9   6,5
-7,5     23,-6   28,-10  10,-2   11,-1   20,-9   14,-2   29,-7   13,-3
-23,-5   24,-8   27,-9   30,-7   28,-5   21,-10  7,9     6,6     21,-5
-27,-10  7,2     30,-9   21,-8   22,-7   24,-9   20,-6   6,9     29,-5
-8,-2    27,-8   30,-5   24,-7
-How many distinct initial velocity values cause the probe to be within the target area after any step?
+####
+
+.#.
+###
+.#.
+
+..#
+..#
+###
+
+#
+#
+#
+#
+
+##
+##
+The rocks fall in the order shown above: first the - shape, then the + shape, and so on. Once the end of the list is reached, the same order repeats: the - shape falls first, sixth, 11th, 16th, etc.
+
+The rocks don't spin, but they do get pushed around by jets of hot gas coming out of the walls themselves. A quick scan reveals the effect the jets of hot gas will have on the rocks as they fall (your puzzle input).
+
+For example, suppose this was the jet pattern in your cave:
+
+>>><<><>><<<>><>>><<<>>><<<><<<>><>><<>>
+In jet patterns, < means a push to the left, while > means a push to the right. The pattern above means that the jets will push a falling rock right, then right, then right, then left, then left, then right, and so on. If the end of the list is reached, it repeats.
+
+The tall, vertical chamber is exactly seven units wide. Each rock appears so that its left edge is two units away from the left wall and its bottom edge is three units above the highest rock in the room (or the floor, if there isn't one).
+
+After a rock appears, it alternates between being pushed by a jet of hot gas one unit (in the direction indicated by the next symbol in the jet pattern) and then falling one unit down. If any movement would cause any part of the rock to move into the walls, floor, or a stopped rock, the movement instead does not occur. If a downward movement would have caused a falling rock to move into the floor or an already-fallen rock, the falling rock stops where it is (having landed on something) and a new rock immediately begins falling.
+
+Drawing falling rocks with @ and stopped rocks with #, the jet pattern in the example above manifests as follows:
+
+The first rock begins falling:
+|..@@@@.|
+|.......|
+|.......|
+|.......|
++-------+
+
+Jet of gas pushes rock right:
+|...@@@@|
+|.......|
+|.......|
+|.......|
++-------+
+
+Rock falls 1 unit:
+|...@@@@|
+|.......|
+|.......|
++-------+
+
+Jet of gas pushes rock right, but nothing happens:
+|...@@@@|
+|.......|
+|.......|
++-------+
+
+Rock falls 1 unit:
+|...@@@@|
+|.......|
++-------+
+
+Jet of gas pushes rock right, but nothing happens:
+|...@@@@|
+|.......|
++-------+
+
+Rock falls 1 unit:
+|...@@@@|
++-------+
+
+Jet of gas pushes rock left:
+|..@@@@.|
++-------+
+
+Rock falls 1 unit, causing it to come to rest:
+|..####.|
++-------+
+
+A new rock begins falling:
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Jet of gas pushes rock left:
+|..@....|
+|.@@@...|
+|..@....|
+|.......|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Rock falls 1 unit:
+|..@....|
+|.@@@...|
+|..@....|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Jet of gas pushes rock right:
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|
+|..####.|
++-------+
+
+Rock falls 1 unit:
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|..####.|
++-------+
+
+Jet of gas pushes rock left:
+|..@....|
+|.@@@...|
+|..@....|
+|.......|
+|..####.|
++-------+
+
+Rock falls 1 unit:
+|..@....|
+|.@@@...|
+|..@....|
+|..####.|
++-------+
+
+Jet of gas pushes rock right:
+|...@...|
+|..@@@..|
+|...@...|
+|..####.|
++-------+
+
+Rock falls 1 unit, causing it to come to rest:
+|...#...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+A new rock begins falling:
+|....@..|
+|....@..|
+|..@@@..|
+|.......|
+|.......|
+|.......|
+|...#...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+The moment each of the next few rocks begins falling, you would see this:
+
+|..@....|
+|..@....|
+|..@....|
+|..@....|
+|.......|
+|.......|
+|.......|
+|..#....|
+|..#....|
+|####...|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@...|
+|..@@...|
+|.......|
+|.......|
+|.......|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@@@.|
+|.......|
+|.......|
+|.......|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|...@...|
+|..@@@..|
+|...@...|
+|.......|
+|.......|
+|.......|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|....@..|
+|....@..|
+|..@@@..|
+|.......|
+|.......|
+|.......|
+|..#....|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@....|
+|..@....|
+|..@....|
+|..@....|
+|.......|
+|.......|
+|.......|
+|.....#.|
+|.....#.|
+|..####.|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@...|
+|..@@...|
+|.......|
+|.......|
+|.......|
+|....#..|
+|....#..|
+|....##.|
+|....##.|
+|..####.|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+
+|..@@@@.|
+|.......|
+|.......|
+|.......|
+|....#..|
+|....#..|
+|....##.|
+|##..##.|
+|######.|
+|.###...|
+|..#....|
+|.####..|
+|....##.|
+|....##.|
+|....#..|
+|..#.#..|
+|..#.#..|
+|#####..|
+|..###..|
+|...#...|
+|..####.|
++-------+
+To prove to the elephants your simulation is accurate, they want to know how tall the tower will get after 2022 rocks have stopped (but before the 2023rd rock begins falling). In this example, the tower of rocks will be 3068 units tall.
+
+How many units tall will the tower of rocks be after 2022 rocks have stopped falling?
 
 
 """
 
 
-def solve(input: List[str]):
-    input = input[0].split(" ")
-    x = list(map(int, input[2][2:-1].split("..")))
-    y = list(map(int, input[3][2:].split("..")))
+def part_factory() -> Iterator[Set[Tuple[int, int]]]:
+    horizontal_line = {(0, 3), (0, 4), (0, 5), (0, 6)}
+    plus = {(0, 4), (1, 3), (1, 4), (1, 5), (2, 4)}
+    reverse_l = {(0, 3), (0, 4), (0, 5), (1, 5), (2, 5)}
+    vertical_line = {(0, 3), (1, 3), (2, 3), (3, 3)}
+    block = {(0, 3), (1, 3), (0, 4), (1, 4)}
 
-    probe = Probe(Point(min(x), min(y)), Point(max(x), max(y)))
-    max_height = probe.get_number_initial_velocity_values()
+    parts = [horizontal_line, plus, reverse_l, vertical_line, block]
+
+    i = 0
+    while True:
+        yield parts[i % len(parts)]
+        i += 1
+
+
+def solve(input: List[str]):
+    new_parts = part_factory()
+    current_part = {(y + 4, x) for y, x in next(new_parts)}
+    resting_parts = []
+
+    # print("\n")
+
+    step = 0
+    max_height = 0
+
+    count_resting_parts = 0
+
+    while count_resting_parts < 1000000000000:
+
+        if count_resting_parts % 100 == 0:
+            print(f"{count_resting_parts} {count_resting_parts // 1000000000000}%")
+
+        # if step > 60:
+        #     break
+
+        character = input[0][step % len(input[0])]
+
+        side_movement = 1 if character == ">" else -1
+        new_position = {(y, x + side_movement) for y, x in current_part}
+
+        if all(0 < x < 8 for y, x in new_position) \
+                and all(len(new_position.intersection(part)) == 0 for part in resting_parts):
+            current_part = new_position
+
+        down_movement = -1
+        new_position = {(y + down_movement, x) for y, x in current_part}
+
+        if all(y > 0 for y, x in new_position) \
+                and all(len(new_position.intersection(part)) == 0 for part in resting_parts):
+            current_part = new_position
+        else:
+            resting_parts.append(current_part)
+            count_resting_parts += 1
+
+            if len(resting_parts) > 200:
+                del resting_parts[0]
+
+            for y in range(max_height, max_height - 40, -1):
+                if all((y, x) in (position for part in resting_parts for position in part) for x in range(1, 8)):
+                    print(f"Found at step {step}")
+                    return
+
+            if (new_max_height := max(y for y, x in current_part)) > max_height:
+                max_height = new_max_height
+
+            current_part = {(y + max_height + 4, x) for y, x in next(new_parts)}
+
+        # print(f"---- After step {step + 1} ({character})----")
+        #
+        # for y in range(max_height + 8, 0, -1):
+        #     row = ["|"]
+        #     for x in range(1, 8):
+        #         if (y, x) in current_part:
+        #             row.append("@")
+        #         elif (y, x) in (position for part in resting_parts for position in part):
+        #             row.append("#")
+        #         else:
+        #             row.append(".")
+        #     row.append("|")
+        #     print("".join(row))
+        #
+        # floor = ["+", "-", "-", "-", "-", "-", "-", "-", "+"]
+        # print("".join(floor))
+        # print(f"New max height: {max_height}")
+
+        # print(f"Current part: {current_part}")
+        # print(f"Resting parts: {resting_parts}")
+
+        step += 1
 
     return max_height
