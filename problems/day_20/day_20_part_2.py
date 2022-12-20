@@ -1,26 +1,31 @@
-from typing import List
-
-from .enhancement import Enhancement
+from collections import deque
+from typing import List, Tuple
 
 """
 
 https://adventofcode.com/2022/day/20
 
---- Part Two ---
-You still can't quite make out the details in the image. Maybe you just didn't enhance it enough.
-
-If you enhance the starting input image in the above example a total of 50 times, 3351 pixels are lit in the final output image.
-
-Start again with the original input image and apply the image enhancement algorithm 50 times. How many pixels are lit in the resulting image?
-
 
 """
 
 
-def solve(input: List[str], steps: int = 1):
-    algorithm = input[0]
-    image = [list(row) for row in input[1:]]
+def move(items: List[int], item: Tuple[int, int]):
+    number, _ = item
+    index = items.index(item)
+    del items[index]
+    new_index = len(items) if (index + number) == 0 else (index + number) % len(items)
+    items.insert(new_index, item)
 
-    enhancement = Enhancement(image, algorithm)
-    enhancement.execute(steps)
-    return enhancement.count_white_pixels()
+
+def solve(input: List[str]):
+    decryption_key = 811589153
+
+    input = [(int(number) * decryption_key, index) for index, number in enumerate(input)]
+    items = deque(input)
+
+    for _ in range(10):
+        for item in input:
+            move(items, item)
+
+    zero_item_index = next(index for index, item in enumerate(items) if item[0] == 0)
+    return sum(items[(zero_item_index + i) % len(items)][0] for i in [1000, 2000, 3000])
