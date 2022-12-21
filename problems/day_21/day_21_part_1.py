@@ -1,84 +1,66 @@
-from dataclasses import dataclass
 from typing import List
 
 """
 
 https://adventofcode.com/2022/day/21
 
---- Day 21: Dirac Dice ---
-There's not much to do as you slowly descend to the bottom of the ocean. The submarine computer challenges you to a nice game of Dirac Dice.
+--- Day 21: Monkey Math ---
+The monkeys are back! You're worried they're going to try to steal your stuff again, but it seems like they're just holding their ground and making various monkey noises at you.
 
-This game consists of a single die, two pawns, and a game board with a circular track containing ten spaces marked 1 through 10 clockwise. Each player's starting space is chosen randomly (your puzzle input). Player 1 goes first.
+Eventually, one of the elephants realizes you don't speak monkey and comes over to interpret. As it turns out, they overheard you talking about trying to find the grove; they can show you a shortcut if you answer their riddle.
 
-Players take turns moving. On each player's turn, the player rolls the die three times and adds up the results. Then, the player moves their pawn that many times forward around the track (that is, moving clockwise on spaces in order of increasing value, wrapping back around to 1 after 10). So, if a player is on space 7 and they roll 2, 2, and 1, they would move forward 5 times, to spaces 8, 9, 10, 1, and finally stopping on 2.
+Each monkey is given a job: either to yell a specific number or to yell the result of a math operation. All of the number-yelling monkeys know their number from the start; however, the math operation monkeys need to wait for two other monkeys to yell a number, and those two other monkeys might also be waiting on other monkeys.
 
-After each player moves, they increase their score by the value of the space their pawn stopped on. Players' scores start at 0. So, if the first player starts on space 7 and rolls a total of 5, they would stop on space 2 and add 2 to their score (for a total score of 2). The game immediately ends as a win for any player whose score reaches at least 1000.
+Your job is to work out the number the monkey named root will yell before the monkeys figure it out themselves.
 
-Since the first game is a practice game, the submarine opens a compartment labeled deterministic dice and a 100-sided die falls out. This die always rolls 1 first, then 2, then 3, and so on up to 100, after which it starts over at 1 again. Play using this die.
+For example:
 
-For example, given these starting positions:
+root: pppw + sjmn
+dbpl: 5
+cczh: sllz + lgvd
+zczc: 2
+ptdq: humn - dvpt
+dvpt: 3
+lfqf: 4
+humn: 5
+ljgn: 2
+sjmn: drzm * dbpl
+sllz: 4
+pppw: cczh / lfqf
+lgvd: ljgn * ptdq
+drzm: hmdt - zczc
+hmdt: 32
+Each line contains the name of a monkey, a colon, and then the job of that monkey:
 
-Player 1 starting position: 4
-Player 2 starting position: 8
-This is how the game would go:
+A lone number means the monkey's job is simply to yell that number.
+A job like aaaa + bbbb means the monkey waits for monkeys aaaa and bbbb to yell each of their numbers; the monkey then yells the sum of those two numbers.
+aaaa - bbbb means the monkey yells aaaa's number minus bbbb's number.
+Job aaaa * bbbb will yell aaaa's number multiplied by bbbb's number.
+Job aaaa / bbbb will yell aaaa's number divided by bbbb's number.
+So, in the above example, monkey drzm has to wait for monkeys hmdt and zczc to yell their numbers. Fortunately, both hmdt and zczc have jobs that involve simply yelling a single number, so they do this immediately: 32 and 2. Monkey drzm can then yell its number by finding 32 minus 2: 30.
 
-Player 1 rolls 1+2+3 and moves to space 10 for a total score of 10.
-Player 2 rolls 4+5+6 and moves to space 3 for a total score of 3.
-Player 1 rolls 7+8+9 and moves to space 4 for a total score of 14.
-Player 2 rolls 10+11+12 and moves to space 6 for a total score of 9.
-Player 1 rolls 13+14+15 and moves to space 6 for a total score of 20.
-Player 2 rolls 16+17+18 and moves to space 7 for a total score of 16.
-Player 1 rolls 19+20+21 and moves to space 6 for a total score of 26.
-Player 2 rolls 22+23+24 and moves to space 6 for a total score of 22.
-...after many turns...
+Then, monkey sjmn has one of its numbers (30, from monkey drzm), and already has its other number, 5, from dbpl. This allows it to yell its own number by finding 30 multiplied by 5: 150.
 
-Player 2 rolls 82+83+84 and moves to space 6 for a total score of 742.
-Player 1 rolls 85+86+87 and moves to space 4 for a total score of 990.
-Player 2 rolls 88+89+90 and moves to space 3 for a total score of 745.
-Player 1 rolls 91+92+93 and moves to space 10 for a final score, 1000.
-Since player 1 has at least 1000 points, player 1 wins and the game ends. At this point, the losing player had 745 points and the die had been rolled a total of 993 times; 745 * 993 = 739785.
+This process continues until root yells a number: 152.
 
-Play a practice game using the deterministic 100-sided die. The moment either player wins, what do you get if you multiply the score of the losing player by the number of times the die was rolled during the game?
-
+However, your actual situation involves considerably more monkeys. What number will the monkey named root yell?
 
 """
 
 
-@dataclass
-class Player:
-    name: str
-    position: int
-    score: int = 0
+def solve(input: List[str]):
+    expressions = {}
 
-    def move(self, steps: int):
-        self.position = (self.position + steps) % 10
-        self.position = self.position + 10 if self.position == 0 else self.position
-        self.score += self.position
+    for line in input:
+        name, expression = line.split(": ")
+        expressions[name] = expression
 
+    def replace(name: str):
+        if expressions[name].isdigit():
+            return expressions[name]
 
-@dataclass
-class Dice:
-    times_rolled: int = 0
-
-    def roll(self) -> int:
-        result = self.times_rolled * 3 + 6
-        self.times_rolled += 3
+        a, operator, b = expressions[name].split(" ")
+        result = eval(f"{replace(a)}  {operator} {replace(b)}")
         return result
 
-
-def solve(input: List[str]):
-    players = [
-        Player("1", int(input[0][-2:])),
-        Player("2", int(input[1][-2:]))
-    ]
-    dice = Dice()
-
-    while True:
-        for i, player in enumerate(players):
-            steps = dice.roll()
-            player.move(steps)
-
-            if player.score >= 1000:
-                return dice.times_rolled * players[(i + 1) % len(players)].score
-
-    return 0
+    return int(replace('root'))
